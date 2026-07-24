@@ -770,17 +770,15 @@ function aggregateCounts(){
  const trimmed = p.trim();
  let mKey = Object.keys(GOAL_COUNTS).find(k => k === trimmed) || Object.keys(GOAL_COUNTS).find(k => trimmed.includes(k) || k.includes(trimmed));
  if(mKey) {
- const multi = parseInt(name.split('x')[1]) || 1;
- counts[mKey] += doneCount * multi;
- if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount*multi;
+ counts[mKey] += doneCount;
+ if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount;
  }
  });
  } else {
  let mKey = Object.keys(GOAL_COUNTS).find(k => k === base) || Object.keys(GOAL_COUNTS).find(k => base.includes(k) || k.includes(base));
  if(mKey) {
- const multi = parseInt(name.split('x')[1]) || 1;
- counts[mKey] += doneCount * multi;
- if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount*multi;
+ counts[mKey] += doneCount;
+ if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount;
  }
  }
  return;
