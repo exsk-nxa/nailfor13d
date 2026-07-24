@@ -1236,6 +1236,56 @@ function saveEvaluation(subjKey) {
  document.getElementById('checklistContainer').style.display = 'none';
 }
 
+function buildScoreTrendSVG(trendData){
+ const width = 700, height = 170;
+ const padding = { top: 26, right: 16, bottom: 26, left: 16 };
+ const chartW = width - padding.left - padding.right;
+ const chartH = height - padding.top - padding.bottom;
+ const n = trendData.length;
+ const stepX = n > 1 ? chartW / (n - 1) : 0;
+ const maxY = 100;
+
+ const points = trendData.map((e, i) => ({
+ x: padding.left + (n > 1 ? i * stepX : chartW / 2),
+ y: padding.top + chartH - (e.score / maxY * chartH),
+ ...e
+ }));
+
+ const passY = padding.top + chartH - (60 / maxY * chartH);
+ const barWidth = Math.min(30, (chartW / n) * 0.45);
+
+ const bars = points.map(p =>
+ `<rect x="${p.x - barWidth/2}" y="${p.y}" width="${barWidth}" height="${padding.top + chartH - p.y}" rx="5" fill="var(--blue-soft)"/>`
+ ).join('');
+
+ const linePath = points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+ const areaPath = linePath +
+ ` L${points[points.length-1].x.toFixed(1)},${(padding.top+chartH).toFixed(1)}` +
+ ` L${points[0].x.toFixed(1)},${(padding.top+chartH).toFixed(1)} Z`;
+
+ const dots = points.map(p => `
+ <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="var(--purple)" stroke="#fff" stroke-width="1.5">
+ <title>${escapeHtml(p.subj)} · ${p.score}점</title>
+ </circle>
+ <text x="${p.x.toFixed(1)}" y="${(p.y-10).toFixed(1)}" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">${p.score}</text>
+ `).join('');
+
+ const labels = points.map(p =>
+ `<text x="${p.x.toFixed(1)}" y="${height-6}" font-size="9.5" text-anchor="middle" fill="var(--ink-soft)">${escapeHtml(p.subj)}</text>`
+ ).join('');
+
+ return `<svg viewBox="0 0 ${width} ${height}" style="width:100%; height:170px; display:block;">
+ <line x1="${padding.left}" y1="${passY.toFixed(1)}" x2="${width-padding.right}" y2="${passY.toFixed(1)}"
+ stroke="var(--coral)" stroke-width="1.5" stroke-dasharray="5,4"/>
+ <text x="${width-padding.right}" y="${(passY-6).toFixed(1)}" font-size="10" fill="var(--coral)" text-anchor="end" font-weight="700">합격선 60점</text>
+ ${bars}
+ <path d="${areaPath}" fill="var(--purple-soft)" opacity="0.45"/>
+ <path d="${linePath}" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+ ${dots}
+ ${labels}
+ </svg>`;
+}
+ 
 function updateStatsDashboard() {
  if(!state.evaluations) return;
  let totalScore = 0, evalCount = 0, todayCnt = 0;
@@ -1294,14 +1344,11 @@ function updateStatsDashboard() {
  : `<div style="font-size:12px; color:var(--ink-soft);">완벽합니다! 특별한 약점이 발견되지 않았습니다.</div>`;
 
  const trendData = allScores.slice(-10);
- let trendHTML = `<div style="display:flex; align-items:flex-end; gap:8px; height:120px; padding:10px 0 0; background:var(--surface-soft); border-radius:12px; padding-left:14px; padding-right:14px;">`;
- trendData.forEach(e => {
- trendHTML += `<div style="flex:1; display:flex; flex-direction:column; align-items:center;" title="${e.subj} (${e.score}점)">
- <span style="font-size:10px; font-weight:700; color:var(--ink); margin-bottom:4px;">${e.score}</span>
- <div style="width:100%; max-width:26px; background:var(--purple); border-radius:6px 6px 0 0; height:${e.score}%; transition:height 0.3s ease;"></div>
- </div>`;
- });
- trendHTML += `</div><div style="font-size:11px; color:var(--ink-soft); text-align:right; margin-top:6px;">최근 10회 기준 (가장 오른쪽이 최신)</div>`;
+ const trendHTML = `
+ <div style="background:var(--surface-soft); border-radius:12px; padding:10px 8px 4px;">
+ ${buildScoreTrendSVG(trendData)}
+ </div>
+ <div style="font-size:11px; color:var(--ink-soft); text-align:right; margin-top:6px;">최근 10회 기준 (가장 오른쪽이 최신) · 점 위에 마우스를 올리면 상세 정보가 보여요</div>`;
  document.getElementById('scoreTrendChart').innerHTML = trendHTML;
 }
 
