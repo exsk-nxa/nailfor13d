@@ -1142,8 +1142,11 @@ function renderTaskGrid(day){
  </div>
 
  <div class="subfeedback">
- <label>이 과제 메모</label>
- <textarea placeholder="종목별 피드백..." oninput="updateSubFeedback(${day},${idx}, this.value)">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
+ <label style="display:flex; justify-content:space-between; align-items:center;">
+ <span>이 과제 메모</span>
+ <button type="button" onclick="openMemoModal(${day},${idx})" style="border:none; background:none; color:var(--blue); font-size:11px; font-weight:700; cursor:pointer; padding:0;">🔍 크게 보기</button>
+ </label>
+ <textarea id="subfb-${day}-${idx}" placeholder="종목별 피드백..." oninput="updateSubFeedback(${day},${idx}, this.value)">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
  </div>
  </div>`;
  }).join('');
@@ -1497,7 +1500,33 @@ async function resetAll(){
  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state), false); }catch(e){}
  renderApp();
 }
-
+function openMemoModal(day, idx){
+ const d = PLAN[day-1];
+ const st = ensureDay(day);
+ const modalRoot = document.getElementById('modalRoot');
+ modalRoot.innerHTML = `
+ <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+ <div class="modal-box" style="max-width:640px;">
+ <div class="modal-head">
+ <div><h3><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${SUBJECT_COLOR[idx]};margin-right:7px;"></span>${SUBJECT_LABEL[idx]} 메모</h3></div>
+ <button class="modal-close" onclick="closeModal()">✕</button>
+ </div>
+ <div class="modal-sub">Day ${day} · ${d.date} · ${escapeHtml(d.subjects[idx].name)}</div>
+ <textarea id="memoModalTextarea" style="width:100%; min-height:280px; border:1px solid var(--line); border-radius:14px; padding:14px 16px; font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.7; resize:vertical; box-sizing:border-box;" placeholder="종목별 피드백...">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
+ <div class="feedback-actions">
+ <button onclick="closeModal()">완료</button>
+ </div>
+ </div></div>`;
+ const ta = document.getElementById('memoModalTextarea');
+ ta.addEventListener('input', (e)=>{
+ updateSubFeedback(day, idx, e.target.value);
+ const small = document.getElementById('subfb-'+day+'-'+idx);
+ if(small) small.value = e.target.value;
+ });
+ ta.focus();
+}
+ 
+ 
 function openSubjectFeedback(idx){
  const label = SUBJECT_LABEL[idx], pct = subjectOverall(idx), entries = [];
  PLAN.forEach(d=>{
