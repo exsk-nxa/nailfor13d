@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>네일 실기 13일 완성 플래너 (종합 평가 모듈 포함)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+ :root{
+ --bg:#F4F7FA;
+ --surface:#FFFFFF;
+ --surface-soft:#EDF2F7;
+ --ink:#1A202C;
+ --ink-soft:#4A5568;
+ --line:#CBD5E0;
+ --blue:#4A6FA5;
+ --blue-soft:#D5E2F0;
+ --coral:#E07A5F;
+ --coral-soft:#F5DDD6;
+ --purple:#6B4C7A;
+ --purple-soft:#E3D6E8;
+ --lime:#6A994E;
+ --lime-soft:#D5E8D9;
+ --gold:#D4A373;
+ --gold-soft:#F0E4D3;
+ --shadow: 0 10px 30px -12px rgba(26,32,44,0.15);
+ --radius: 18px;
+ }
+ *{box-sizing:border-box;}
+ body{
+ margin:0;
+ background: var(--bg);
+ color:var(--ink);
+ font-family:'Noto Sans KR', sans-serif;
+ -webkit-font-smoothing:antialiased;
+ padding-bottom:80px;
+ }
+ h1,h2,h3{font-weight:800;}
+ .wrap{max-width:1180px; margin:0 auto; padding:36px 24px 0;}
+
+ header.top{display:flex; flex-wrap:wrap; gap:28px; align-items:flex-end; justify-content:space-between; margin-bottom:28px;}
+ .brand-eyebrow{font-size:12px; letter-spacing:0.28em; color:var(--blue); font-weight:700; text-transform:uppercase; margin-bottom:6px;}
+ header.top h1{font-size:34px; margin:0 0 4px; font-weight:700; color:var(--ink);}
+ header.top p{margin:0; color:var(--ink-soft); font-size:14px;}
+ .overall-card{
+ background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow);
+ padding:18px 26px; display:flex; align-items:center; gap:20px; min-width:290px;
+ }
+ .overall-ring{position:relative; width:74px; height:74px; flex:none;}
+ .overall-ring svg{transform:rotate(-90deg);}
+ .overall-ring .pct{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:17px;}
+ .overall-meta .label{font-size:11px; color:var(--ink-soft); letter-spacing:.08em;}
+ .overall-meta .num{font-size:13px; margin-top:2px; color:var(--ink);}
+
+ .subject-row{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:30px;}
+ .subject-mini{background:var(--surface); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow);}
+ .subject-mini .top-line{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+ .subject-mini .dot{width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:6px;}
+ .subject-mini .name{font-size:12.5px; font-weight:600; color:var(--ink);}
+ .subject-mini .pct{font-size:13px; font-weight:800;}
+ .bar-track{height:7px; border-radius:10px; background:var(--surface-soft); overflow:hidden;}
+ .bar-fill{height:100%; border-radius:10px; transition:width .5s ease;}
+
+ section.calendar, section.checklist-module, section.stats-module {background:var(--surface); border-radius:24px; box-shadow:var(--shadow); padding:26px 26px 22px; margin-bottom:30px;}
+ .section-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+ .section-head h2{font-size:19px; margin:0;}
+ .section-head .hint{font-size:12px; color:var(--ink-soft);}
+ .week-label{font-size:11px; color:var(--ink-soft); letter-spacing:.1em; margin:14px 0 8px; text-transform:uppercase;}
+ .cal-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:10px;}
+ .nail-cell{
+ position:relative; border:none; cursor:pointer; background:var(--surface-soft);
+ border-radius:16px;
+ height:96px; overflow:hidden; padding:0;
+ box-shadow: inset 0 0 0 2px var(--line);
+ transition: box-shadow .2s ease, transform .15s ease;
+ }
+ .nail-cell:hover{transform:translateY(-2px);}
+ .nail-cell.active{box-shadow: inset 0 0 0 2.5px var(--ink);}
+ .nail-fill{position:absolute; left:0; right:0; bottom:0; transition:height .5s ease;}
+ .nail-cell .label{position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; height:100%; padding-top:10px; pointer-events:none;}
+ .nail-cell .day-num{font-weight:700; font-size:15px;}
+ .nail-cell .day-date{font-size:9.5px; color:var(--ink-soft); margin-top:1px;}
+ .nail-cell .day-pct{margin-top:6px; font-size:10.5px; font-weight:700; background:rgba(255,255,255,.75); border-radius:8px; padding:1px 6px;}
+ .nail-cell.mock::after{
+ content:'모의'; position:absolute; top:5px; right:5px; z-index:3; font-size:8.5px; font-weight:700; line-height:1;
+ color:#fff; background:var(--purple); padding:3px 6px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,.2);
+ }
+
+ section.day-panel{background:var(--surface); border-radius:24px; box-shadow:var(--shadow); padding:28px 28px 24px; margin-bottom:30px;}
+ .day-panel-head{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:16px;}
+ .day-panel-head h2{font-size:24px; margin:0;}
+ .day-panel-head .date-note{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+ .note-chip{display:inline-block; margin-left:8px; font-size:11px; background:var(--blue-soft); color:var(--blue); padding:2px 9px; border-radius:20px; font-weight:600;}
+ .today-progress{display:flex; align-items:center; gap:12px;}
+ .today-progress .ring-wrap{width:56px; height:56px; position:relative;}
+ .today-progress .ring-wrap .pct{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;}
+ .today-progress .cap{font-size:11px; color:var(--ink-soft);}
+
+ .task-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:22px;}
+ @media (max-width:980px){.task-grid{grid-template-columns:repeat(2,1fr);}}
+ @media (max-width: 600px) {.modal-box, .info-modal-box,
+ .visual-timer-box { margin: 0 8px; width: calc(100% - 16px); max-width: 100%; padding: 20px 16px; border-radius: 16px; max-height: 90vh; }
+ .visual-timer-box { padding: 24px 16px 20px; }
+}
+ .task-card{border-radius:16px; padding:16px 16px 14px; border:1px solid var(--line); background:linear-gradient(180deg, #fff, #f9fafb);}
+ .task-card .subj-tag{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:.04em; color:#fff; padding:3px 9px; border-radius:20px; margin-bottom:10px;}
+ .task-card .content-name{font-size:15px; font-weight:700; margin:0 0 2px; line-height:1.3;}
+ .task-card .target-line{font-size:11.5px; color:var(--ink-soft); margin-bottom:10px;}
+ .reps{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px;}
+ .rep-btn{
+ width:30px; height:30px; border-radius:9px; border:1.5px solid var(--line); background:#fff;
+ cursor:pointer; font-size:12px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; justify-content:center;
+ transition:all .15s ease;
+ }
+ .rep-btn.done{color:#fff; border-color:transparent;}
+ .task-mini-track{height:5px; border-radius:8px; background:var(--surface-soft); overflow:hidden; margin-bottom:10px;}
+ .task-mini-fill{height:100%; border-radius:8px; transition:width .4s ease;}
+
+ .time-log-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 11.5px; color: var(--ink-soft); }
+ .time-log-row input[type="number"] { width: 60px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; font-weight: 600; text-align: center; }
+ .time-log-row .compare { font-weight: 700; margin-left: 4px; }
+ .time-log-row .compare.good { color: var(--lime); }
+ .time-log-row .compare.bad { color: var(--coral); }
+
+ .timer-row{display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:var(--ink-soft); margin-bottom:8px; background:var(--surface-soft); border-radius:10px; padding:6px 9px;}
+ .timer-row .t-target{font-weight:600;}
+ .timer-row .t-elapsed{font-weight:700; color:var(--ink);}
+ .timer-row .t-elapsed.over{color:var(--coral);}
+ .timer-btns{display:flex; gap:6px;}
+ .timer-btns button{border:none; background:var(--ink); color:#fff; font-size:10.5px; border-radius:7px; padding:4px 8px; cursor:pointer;}
+ .timer-btns button.secondary{background:var(--line); color:var(--ink);}
+
+ .subfeedback textarea{width:100%; font-size:11.5px; border:1px solid var(--line); border-radius:10px; padding:7px 9px; resize:vertical; min-height:44px; font-family:'Noto Sans KR',sans-serif; color:var(--ink); background:#fff;}
+ .subfeedback label{font-size:10.5px; color:var(--ink-soft); display:block; margin-bottom:3px;}
+
+ .mock-analysis { background: var(--purple-soft); border-radius: 12px; padding: 14px 16px; margin-top: 18px; }
+ .mock-analysis h4 { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--purple); }
+ .mock-analysis .row { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 8px; }
+ .mock-analysis .row label { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+ .mock-analysis .row input[type="number"], .mock-analysis .row input[type="text"] { padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; width: 80px; }
+ .mock-analysis .row input[type="text"] { width: 140px; }
+ .mock-analysis textarea { width: 100%; min-height: 50px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; resize: vertical; font-family: inherit; }
+
+ .day-feedback{border-radius:16px; background:var(--surface-soft); padding:16px 18px; margin-top:6px;}
+ .day-feedback h3{margin:0 0 4px; font-size:15px;}
+ .day-feedback .sub{font-size:11.5px; color:var(--ink-soft); margin-bottom:10px;}
+ .day-feedback textarea{width:100%; min-height:74px; border-radius:12px; border:1px solid var(--line); padding:10px 12px; font-family:'Noto Sans KR',sans-serif; font-size:13px; resize:vertical;}
+ .feedback-actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+ .feedback-actions button{
+ border:none; border-radius:20px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer;
+ background:var(--ink); color:#fff;
+ }
+ .feedback-actions button.secondary{background:#fff; color:var(--ink); border:1px solid var(--line);}
+ .save-flag{font-size:10.5px; color:var(--lime); opacity:0; transition:opacity .3s;}
+ .save-flag.show{opacity:1;}
+ .save-badge{font-size:11px; padding:4px 11px; border-radius:20px; font-weight:600; background:var(--surface-soft); color:var(--ink-soft); white-space:nowrap;}
+ .save-badge.ok{background:var(--lime-soft); color:var(--lime);}
+ .save-badge.saving{background:var(--coral-soft); color:var(--coral);}
+ .save-badge.err{background:var(--blue-soft); color:var(--blue); cursor:pointer;}
+ .t-elapsed.danger{color:var(--purple); animation:pulse 1s infinite;}
+ @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.45;}}
+ .t-elapsed.done{color:var(--lime);}
+
+ section.viz{background:var(--surface); border-radius:24px; box-shadow:var(--shadow); padding:26px 28px 22px; margin-bottom:30px;}
+ .viz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px;}
+ .viz-grid .chart-group:nth-child(1) { order: 1; } 
+ .viz-grid .chart-group:nth-child(2) { order: 3; } 
+ .viz-grid .chart-group:nth-child(3) { order: 2; } 
+ .viz-grid .chart-group:nth-child(4) { order: 4; } 
+
+ @media (max-width: 900px) {
+ .viz-grid { grid-template-columns: 1fr; }
+ .viz-grid .chart-group { order: 0 !important; }
+}
+ .chart-group{background:var(--surface); border-radius:16px; padding:16px 18px; border:1px solid var(--line); margin-bottom:0;}
+ .chart-group.small-padding{padding:12px 14px;} 
+ .chart-group-title{font-weight:700; font-size:14px; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+ .chart-group-title .dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+ .chart-item{display:flex; align-items:center; gap:12px; margin-bottom:6px; font-size:12.5px;}
+ .chart-item .name{width:120px; flex-shrink:0; font-weight:500; color:var(--ink);}
+ .chart-item .bar-wrap{flex:1; height:18px; background:var(--surface-soft); border-radius:10px; overflow:hidden; position:relative;}
+ .chart-item .bar-fill{height:100%; border-radius:10px; transition:width 0.5s ease;}
+ .chart-item .bar-over{height:100%; border-radius:0 10px 10px 0; background:var(--gold); transition:width 0.5s ease;}
+ .chart-item .label{width:70px; flex-shrink:0; text-align:right; font-size:11.5px; color:var(--ink-soft); font-weight:600;}
+ .chart-item .label .achieved{color:var(--ink); font-weight:700;}
+ .chart-item .label .goal{color:var(--ink-soft);}
+ .chart-item .label .over{color:var(--gold); font-weight:700;}
+
+ .modal-overlay{position:fixed; inset:0; background:rgba(26,32,44,.55); display:flex; align-items:center; justify-content:center; z-index:100; padding:16px; animation:fadeIn .2s ease;}
+ @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+ .modal-box{background:var(--surface); border-radius:22px; max-width:560px; width:100%; max-height:82vh; overflow-y:auto; padding:26px 28px; box-shadow:0 30px 60px -20px rgba(26,32,44,.4);}
+ .modal-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
+ .modal-head h3{margin:0; font-size:19px;}
+ .modal-head .modal-pct{font-size:13px; font-weight:800;}
+ .modal-sub{font-size:12px; color:var(--ink-soft); margin-bottom:16px;}
+ .modal-close{border:none; background:var(--surface-soft); color:var(--ink-soft); width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:14px; line-height:1;}
+ .memo-item{border-left:3px solid var(--line); padding:8px 0 8px 14px; margin-bottom:10px;}
+ .memo-item .memo-day{font-size:11.5px; font-weight:700; color:var(--ink);}
+ .memo-item .memo-content{font-size:11px; color:var(--ink-soft); margin-bottom:3px;}
+ .memo-item .memo-text{font-size:13px; color:var(--ink); line-height:1.5; white-space:pre-wrap;}
+ .modal-empty{font-size:13px; color:var(--ink-soft); text-align:center; padding:30px 0;}
+
+ .mock-box{background:var(--purple-soft); border-radius:16px; padding:16px 20px; margin-bottom:22px;}
+ .mock-box h3{margin:0 0 10px; font-size:14.5px; color:var(--purple);}
+ .mock-round-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:10px;}
+ .mock-round-card{background:#fff; border-radius:12px; padding:11px 13px; border:1px solid var(--line);}
+ .mock-round-head{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--purple); margin-bottom:6px;}
+ .mock-round-head .mock-code{font-size:10.5px; color:var(--ink-soft); font-weight:600;}
+ .mock-round-body{font-size:11.5px; color:var(--ink); line-height:1.75;}
+ .mock-round-body i{width:7px; height:7px; border-radius:50%; display:inline-block; margin-right:6px;}
+
+ .info-modal-box {max-width: 1120px; width: 100%; background: var(--surface); border-radius: 24px; padding: 28px 30px; max-height: 86vh; overflow-y: auto; box-shadow: 0 30px 70px -20px rgba(26, 32, 44, 0.4);}
+ .info-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--line); margin-bottom: 20px; padding-bottom: 2px; overflow-x: auto;}
+ .info-tab-btn { background: none; border: none; padding: 9px 15px; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-radius: 8px 8px 0 0; white-space: nowrap; position: relative;}
+ .info-tab-btn.active { color: var(--blue); font-weight: 700;}
+ .info-tab-btn.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 3px; background: var(--blue); border-radius: 2px;}
+ .info-tab-content { display: none;}
+ .info-tab-content.active { display: block; animation: fadeIn 0.25s ease;}
+ .info-table { width: 100%; table-layout: auto; border-collapse: collapse; margin-bottom: 22px; font-size: 12.5px; text-align: left; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--line);}
+ .info-table th { background: var(--surface-soft); color: var(--ink); font-weight: 700; padding: 12px 16px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+ .info-table td { padding: 12px 16px; border-bottom: 1px solid #f1f3f5; color: var(--ink); line-height: 1.6; vertical-align: middle; word-break: break-word; white-space: normal; }
+ .info-table tr:last-child td { border-bottom: none;}
+ .info-sec-title { font-size: 15px; font-weight: 700; margin: 20px 0 10px; color: var(--ink); display: flex; align-items: center; gap: 6px;}
+
+ .photo-fb-banner{font-size:11.5px; padding:10px 14px; border-radius:12px; margin-bottom:14px; line-height:1.5;}
+ .photo-fb-banner.ok{background:var(--lime-soft); color:var(--lime);}
+ .photo-group { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 18px; margin-bottom: 24px; box-shadow: var(--shadow); }
+ .photo-group-title { font-weight: 700; font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--ink); }
+ .photo-group-title .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+ .photo-grid { display: flex; flex-wrap: wrap; gap: 24px; }
+ .photo-card { flex: 0 0 230px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+ .photo-card .photo-slot { width: 100%; flex: none; min-width: 0; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; background: var(--surface-soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+ .photo-card .photo-slot iframe { width: 100%; height: 100%; border: none; display: block; object-fit: cover; }
+ .photo-card .photo-name { font-size: 14px; font-weight: 600; color: var(--ink); text-align: center; line-height: 1.3; }
+ .photo-card .photo-desc { font-size: 11.5px; color: var(--ink-soft); text-align: center; line-height: 1.4; }
+ .common-guide { background: var(--purple-soft); border: 1.5px solid var(--purple); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 16px; }
+ .common-guide .photo-grid { gap: 20px; }
+ .common-guide .photo-card { flex: 0 0 200px; }
+
+ .visual-timer-overlay{position:fixed; inset:0; background:rgba(26,32,44,.5); display:flex; align-items:center; justify-content:center; z-index:200; padding:20px; animation:fadeIn .2s ease;}
+ .visual-timer-box{background:#fff; border-radius:32px; max-width:560px; width:100%; padding:32px 28px 28px; text-align:center; box-shadow:0 30px 70px -20px rgba(26,32,44,.45);}
+ .visual-timer-box h3{margin:0; font-size:18px; font-weight:700;}
+ .visual-timer-box .vt-sub{font-size:12px; color:var(--ink-soft); margin:4px 0 0;}
+ .visual-timer-body{display:flex; align-items:center; gap:24px; margin-top:12px; text-align:left;}
+ .timer-steps{flex:1; min-width:0; align-self:stretch; display:flex; flex-direction:column;}
+ .timer-steps-label{font-size:11.5px; font-weight:700; color:var(--ink-soft); letter-spacing:.04em; margin-bottom:6px;}
+ .timer-steps textarea{
+ flex:1; width:100%; min-height:200px; resize:vertical; box-sizing:border-box;
+ border:1px solid var(--line); border-radius:14px; padding:12px 13px;
+ font-family:inherit; font-size:12.5px; line-height:1.7; color:var(--ink);
+ background:var(--surface-soft); outline:none;
+ }
+ .timer-steps textarea:focus{box-shadow:0 0 0 2px var(--blue-soft); border-color:var(--blue);}
+ .timer-clock-col{flex:none; display:flex; flex-direction:column; align-items:center;}
+ .visual-clock{width:200px; height:200px; margin:0 auto; border-radius:50%; position:relative; background:#f0f4f8; box-shadow:inset 0 0 0 2px var(--line);}
+ .visual-clock-face{position:absolute; inset:0; border-radius:50%; background:conic-gradient(var(--blue) 0% 100%, #e2e8f0 100% 100%); transition:background 0.2s;}
+ .visual-clock-knob{position:absolute; top:50%; left:50%; width:14px; height:14px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 2px 8px rgba(0,0,0,0.15), 0 0 0 3px var(--blue);}
+ .visual-time-text{font-weight:800; font-size:36px; margin-top:16px; color:var(--ink); letter-spacing:0.02em;}
+ .visual-time-text.over{color:var(--coral);}
+ .visual-timer-actions{display:flex; gap:10px; justify-content:center; margin-top:20px;}
+ .visual-timer-actions button{border:none; padding:9px 22px; font-size:13px; font-weight:700; border-radius:30px; cursor:pointer; background:var(--ink); color:#fff; transition:background .15s;}
+ .visual-timer-actions button.gold{background:var(--coral);}
+ .visual-timer-actions button.ghost{background:var(--surface-soft); color:var(--ink-soft); border:1px solid var(--line);}
+
+ .top-actions{display:flex; justify-content:flex-end; align-items:center; gap:10px; margin:-8px 0 26px;}
+ .reset-btn{background:none; border:1px solid var(--line); color:var(--ink-soft); font-size:11.5px; padding:6px 12px; border-radius:20px; cursor:pointer;}
+ .loading{text-align:center; padding:80px 0; color:var(--ink-soft); font-size:13px;}
+ 
+ .prep-modal .prep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; margin: 12px 0; }
+ .prep-modal label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+ .prep-modal input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--blue); }
+
+ /* Responsive */
+ @media (max-width: 900px) {
+  #statsContainer { grid-template-columns: 1fr !important; }
+  #statsContainer > div:nth-child(3) { grid-column: 1 / 2 !important; }
+ }
+ @media (max-width: 600px) {
+ .wrap {padding: 16px 12px; }
+ header.top { flex-direction: column; align-items: stretch; gap: 16px; }
+ header.top h1 { font-size: 24px; }
+ .overall-card { min-width: unset; width: 100%; flex-wrap: wrap; padding: 14px 18px; }
+ .overall-ring { width: 60px; height: 60px; }
+ .overall-ring .pct { font-size: 14px; }
+ .subject-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+ .subject-mini { padding: 10px 12px; }
+ .task-grid { grid-template-columns: 1fr; gap: 12px; }
+ .visual-clock { width: 150px; height: 150px; }
+ .visual-time-text { font-size: 28px; }
+ .visual-timer-body { flex-direction: column-reverse; gap: 16px; }
+ .timer-steps textarea { min-height: 80px; }
+ .visual-timer-box { max-width: 100%; padding: 20px 16px; }
+ .cal-grid { gap: 6px; }
+ .nail-cell { height: 72px; border-radius: 12px; }
+ .nail-cell .day-num { font-size: 13px; }
+ .nail-cell .day-date { font-size: 8px; }
+ .nail-cell .day-pct { font-size: 9px; padding: 0 4px; }
+ .week-label { font-size: 10px; margin: 10px 0 4px; }
+ .modal-overlay { padding: 12px; }
+ .modal-box,
+ .info-modal-box {margin: 0 8px; padding: 18px 14px; border-radius: 16px; max-height: 90vh; }
+ .info-modal-box { padding: 16px 12px; }
+ .info-tabs { gap: 4px; }
+ .info-tab-btn { font-size: 11px; padding: 6px 10px; }
+ .info-table { font-size: 11px; }
+ .info-table th,
+ .info-table td { padding: 8px 10px; }
+ .photo-group { padding: 14px 12px; }
+ .photo-card { flex: 0 0 140px; }
+ .common-guide .photo-card { flex: 0 0 120px; }
+ .photo-grid { gap: 12px; }
+ }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+ <div id="loadingMsg" class="loading">데이터를 불러오는 중…</div>
+</div>
+<div id="modalRoot"></div>
+<div id="visualTimerRoot"></div>
+
+<script>
+/* ============ 1. 구글 스프레드시트(Apps Script) 저장소 설정 ============ */
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsGQvm8pzUZo2AcM9fU5LLMLtjULrQMLWjOVHhdDcWH5NMGvbVOVeFmNK2BqOqB1cjHA/exec";
+
+window.storage = {
+ get: async (key, defaultValue) => {
+ try {
+ const res = await fetch(`${GOOGLE_SCRIPT_URL}?key=${encodeURIComponent(key)}`);
+ const data = await res.json();
+ if (data && data.value) {
+ return { value: data.value };
+ }
+ } catch (e) {
+ console.warn('구글 시트 읽기 실패, localStorage 폴백', e);
+ }
+ const val = localStorage.getItem(key);
+ return { value: val || defaultValue };
+ },
+ set: async (key, value) => {
+ try {
+ await fetch(GOOGLE_SCRIPT_URL, {
+ method: 'POST',
+ headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+ body: JSON.stringify({ action: "set", key: key, value: value })
+ });
+ return true;
+ } catch (e) {
+ console.warn('구글 시트 저장 서버 통신 중, localStorage 동시 기록', e);
+ }
+ localStorage.setItem(key, value);
+ return true;
+ }
+};
+
+/* ============ 2. PLAN (13일 수정) ============ */
+const PLAN = [
+ {day:1, date:'7/24(금)', note:'첫날, 균형 잡힌 스타트. 오전에 3과목 3회 처리.', mock:false, subjects:[
+ {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'아크릴 x3', count:3},{name:'제거-아크릴 x3', count:3}]},
+ {day:2, date:'7/25(토)', note:'종일 모델손. 실크 정밀 교정 집중.', mock:false, subjects:[
+ {name:'딥프렌치 풀 x2', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크 x3', count:3},{name:'제거-실크 x3', count:3}]},
+ {day:3, date:'7/26(일)', note:'종일 모델손. 18~19시 수업 제외. 프렌치 비중 상향.', mock:false, subjects:[
+ {name:'그라데이션 풀 x2 + 프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴 x3', count:3},{name:'제거-아크릴 x3', count:3}]},
+ {day:4, date:'7/27(월)', note:'모의고사(20~23시)는 실제 모델손. 낮 시간에 1·2과목+실크 처리.', mock:true, subjects:[
+ {name:'프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'실크 x2', count:2},{name:'제거-실크 x2', count:2}]},
+ {day:5, date:'7/28(화)', note:'모의고사 전까지 팁/젤 연장 대량 처리.', mock:true, subjects:[
+ {name:'딥프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'팁위드랩2+젤1', count:1},{name:'제거 x3', count:3}]},
+ {day:6, date:'7/29(수)', note:'14~17시 병원. 오전에 1·2과목+젤 2회 몰아서 끝내기.', mock:true, subjects:[
+ {name:'그라데이션 풀 x1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'젤 x2', count:2},{name:'제거-젤 x2', count:2}]},
+ {day:7, date:'7/30(목)', note:'20~21시 수업 제외. 3과목 혼합으로 감각 유지.', mock:false, subjects:[
+ {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴2+실크1', count:1},{name:'제거 x3', count:3}]},
+ {day:8, date:'7/31(금)', note:'', mock:true, subjects:[
+ {name:'그라데이션 풀 x1', count:1},{name:'선+부채꼴 합본1 + 부채꼴단일0.5', count:1},{name:'아크릴 x2', count:2},{name:'제거-아크릴 x2', count:2}]},
+ {day:9, date:'8/1(토)', note:'9시간 가용 시간에 맞춰 1과목 3세트로 균형 훈련', mock:false, subjects:[
+ {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'아크릴 x2', count:2},{name:'제거-아크릴 x2', count:2}]},
+ {day:10, date:'8/2(일)', note:'종일 모델손. 실크 3회 + 아크릴 1회로 밸런스 회복.', mock:false, subjects:[
+ {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크3 + 아크릴1', count:1},{name:'제거 x4', count:4}]},
+ {day:11, date:'8/3(월)', note:'일반연습 9시간에 맞춤. 모의고사 전에 1·2과목 속도 단축 훈련.', mock:true, subjects:[
+ {name:'프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴2+실크1', count:1},{name:'제거 x3', count:3}]},
+ {day:12, date:'8/4(화)', note:'도구 최종 점검 & 모든 종목 1회씩 골고루 체크.', mock:true, subjects:[
+ {name:'프렌치 풀 x1', count:1},{name:'선마블링 단일 x1', count:1},{name:'실크1+젤1+팁1+아크릴1', count:1},{name:'제거 x4', count:4}]},
+ {day:13, date:'8/5(수)', note:'🚨 6~9시 가벼운 손풀기. 9~12시 최종 모의고사. 13시 시험 시작!', mock:true, subjects:[
+ {name:'프렌치 축소 0.5', count:1},{name:'부채꼴 단일 0.5', count:1},{name:'연장 없음', count:0},{name:'제거 없음', count:0}]}
+];
+
+/* ============ 3. MOCK_ROUNDS (7회) ============ */
+const MOCK_ROUNDS = [
+ {round:'1회차', date:'7/27(월)', sub1:'레드풀컬러', sub2:'선마블링', sub3:'실크연장', sub4:'제거', code:'R-L-S'},
+ {round:'2회차', date:'7/28(화)', sub1:'프렌치', sub2:'부채꼴마블링', sub3:'내추럴팁위드랩', sub4:'제거', code:'F-C-T'},
+ {round:'3회차', date:'7/29(수)', sub1:'딥프렌치', sub2:'선마블링', sub3:'젤원톤스컬프쳐', sub4:'제거', code:'D-L-J'},
+ {round:'4회차', date:'7/31(금)', sub1:'화이트그라데이션', sub2:'부채꼴마블링', sub3:'아크릴프렌치스컬프쳐', sub4:'제거', code:'G-C-A'},
+ {round:'5회차', date:'8/3(월)', sub1:'프렌치', sub2:'선마블링', sub3:'아크릴프렌치스컬프쳐', sub4:'제거', code:'F-L-A'},
+ {round:'6회차', date:'8/4(화)', sub1:'딥프렌치', sub2:'부채꼴마블링', sub3:'실크연장', sub4:'제거', code:'D-C-S'},
+ {round:'7회차', date:'8/5(수)', sub1:'화이트그라데이션', sub2:'선마블링', sub3:'젤원톤스컬프쳐', sub4:'제거', code:'G-L-J'}
+];
+
+const SUBJECT_LABEL = ['1과목','2과목','3과목','4과목'];
+const SUBJECT_COLOR = ['var(--blue)','var(--coral)','var(--purple)','var(--lime)'];
+const SUBJECT_COLOR_HEX = ['#4A6FA5','#E07A5F','#6B4C7A','#6A994E'];
+
+const GOAL_COUNTS = {
+ '레드풀컬러': 85, '프렌치': 30, '딥프렌치': 28, '화이트그라데이션': 25,
+ '선마블링': 46, '부채꼴마블링': 44,
+ '내추럴팁위드랩': 21, '젤원톤스컬프쳐': 21, '아크릴프렌치스컬프쳐': 26, '실크연장': 24,
+ '제거': 58
+};
+const WEEK_MIN = {1:[30,35,40,15], 2:[26,30,33,13], 3:[22,25,27,11]};
+function weekOf(day){ return day<=7?1: day<=14?2:3; }
+
+/* ============ 상세 평가 기준 (업데이트) ============ */
+const EVAL_CRITERIA = {
+ 'redfull': [
+  '[공통] 한 방향 파일링으로 쉐입(손: 라운드, 발: 스퀘어)을 정확히 잡았는가',
+  '[공통] 아트용 브러시 없이 내장 브러시만 사용했는가',
+  '[공통] 프리에지 단면(앞선)까지 컬러를 꼼꼼히 발랐는가',
+  '[공통] 피부에 묻은 폴리시를 깨끗이 지우고 큐티클 오일을 바르지 않았는가',
+  '베이스 1회 → 컬러 2회 → 탑 1회 순서를 지켰는가',
+  '큐티클 라인에 넘치지 않게 풀로 꽉 채워 발랐는가',
+  '얼룩 없이 얇고 고르게 발렸으며, 진한 발색을 띄는가'
+ ],
+ 'french': [
+  '[공통] 한 방향 파일링으로 쉐입을 잡고 내장 브러시만 사용했는가',
+  '[공통] 프리에지 단면(앞선)까지 꼼꼼히 바르고 피부 잔여물을 지웠는가',
+  '[공통] 심사 전 큐티클 오일을 바르지 않았는가',
+  '스마일 라인의 상하 너비가 0.3~0.5cm로 5지 모두 일정한가',
+  '찌그러짐 없이 좌우가 완벽히 대칭되는 완만한 곡선을 그렸는가',
+  '표면 굴곡이나 얼룩 없이 고르게 도포되었는가'
+ ],
+ 'deepfrench': [
+  '[공통] 한 방향 파일링(쉐입) 및 내장 브러시만 사용했는가',
+  '[공통] 프리에지 단면 도포 및 피부 잔여물 제거, 오일 금지를 지켰는가',
+  '도포 범위가 전체 길이의 1/2 이상을 덮었는가',
+  '흰색 컬러가 안쪽 반월(루눌라) 부분을 침범하지 않았는가',
+  '프렌치 라인이 좌우 완벽한 대칭이며 5지 모두 모양이 균일한가',
+  '표면 굴곡이나 얼룩 없이 고르게 도포되었는가'
+ ],
+ 'gradation': [
+  '[공통] 한 방향 파일링(쉐입) 및 피부 잔여물 제거, 오일 금지를 지켰는가',
+  '[공통] 프리에지 단면(앞선)까지 꼼꼼히 도포했는가',
+  '도포 범위가 전체 길이의 1/2 이상인가',
+  '프리에지 쪽으로 갈수록 자연스럽게 진해지도록 퍼졌는가',
+  '스펀지 자국이나 뜯김 없이 표면이 매끄러운가'
+ ],
+ 'linemarble': [
+  '[공통] 시술 전 표면 샌딩 및 유·수분 제거를 완료했는가',
+  '[공통] 아트용 세필 브러시를 적절히 활용했는가',
+  '[공통] 완성 후 미경화 젤 완벽 제거 및 오일 바르지 않기를 지켰는가',
+  '세로 8줄(흰/빨 교대 각 4개, 5지는 6줄)을 일정 간격으로 그렸는가',
+  '가로 5줄(좌우 교대로 끌기, 5지는 3줄)을 완만하고 명료하게 그렸는가',
+  '마블링을 그리는 과정에서 미경화 젤을 닦아내지 않았는가',
+  '표면 단차(두께 차이) 없이 탑젤로 매끄럽게 마무리되었는가'
+ ],
+ 'fanmarble': [
+  '[공통] 시술 전 표면 샌딩 및 유·수분 제거를 완료했는가',
+  '[공통] 아트용 세필 브러시 활용 및 마지막 미경화 젤/오일 제거를 지켰는가',
+  '바탕에 빨간색 젤 폴리시를 1회 이상 풀코트로 도포 후 마블링을 시작했는가',
+  '가로선 총 7줄(둥근 부채꼴 흰4/빨3, 5지는 5줄)을 그렸는가',
+  '세로선 총 7줄(중앙 아래 구심점 향해, 5지는 5줄)을 선명하게 끌어내렸는가',
+  '마블링을 그리는 과정에서 미경화 젤을 닦아내지 않았는가',
+  '표면 단차(두께 차이) 없이 탑젤로 매끄럽게 마무리되었는가'
+ ],
+ 'tipwrap': [
+  '[공통] 스퀘어 쉐입과 사이드 일직선을 정확히 맞췄는가',
+  '[공통] 길이 0.5~1cm 미만, 두께 0.5~1mm 이하 규격을 충족하는가',
+  '[공통] 적절한 타이밍에 핀칭을 주어 퍼지지 않는 C-커브(20~40%)를 만들었는가',
+  '[공통] 하이포인트 굴곡이 자연스럽게 형성되었는가',
+  '[공통] 기포 없이 맑고 투명하며, 심사 전 오일기를 완벽히 닦아냈는가',
+  '내추럴 하프 웰 팁을 기포 없이 밀착시키고 턱(단차)을 완벽히 갈아내었는가',
+  '실크를 큐티클 라인에서 1mm 정도 띄우고 빈틈없이 부착했는가'
+ ],
+ 'gel': [
+  '[공통] 스퀘어 쉐입과 사이드 일직선을 정확히 맞췄는가',
+  '[공통] 길이 0.5~1cm 미만, 두께 0.5~1mm 이하 규격을 충족하는가',
+  '[공통] 적절한 타이밍에 핀칭을 주어 퍼지지 않는 C-커브(20~40%)를 만들었는가',
+  '[공통] 하이포인트 굴곡이 자연스럽게 형성되었는가',
+  '[공통] 기포 없이 맑고 투명하며, 심사 전 오일기를 완벽히 닦아냈는가',
+  '폼지를 쳐지거나 들림 없이 일직선으로 끼웠는가',
+  '투명 젤만 사용하였으며, 샤이너 대신 탑 젤을 사용하여 광택을 냈는가'
+ ],
+ 'acrylic': [
+  '[공통] 스퀘어 쉐입과 사이드 일직선을 정확히 맞췄는가',
+  '[공통] 길이 0.5~1cm 미만, 두께 0.5~1mm 이하 규격을 충족하는가',
+  '[공통] 적절한 타이밍에 핀칭을 주어 퍼지지 않는 C-커브(20~40%)를 만들었는가',
+  '[공통] 하이포인트 굴곡이 자연스럽게 형성되었는가',
+  '[공통] 기포 없이 맑고 투명하며, 심사 전 오일기를 완벽히 닦아냈는가',
+  '화이트 폴리머를 사용하여 스마일 라인을 가장 먼저 떴는가',
+  '스마일 라인이 프리에지를 충분히 가리며 좌우가 완벽히 대칭되는가',
+  '핑크/클리어 파우더를 덮을 때 화이트 라인을 침범(탁해짐)하지 않았는가'
+ ],
+ 'silk': [
+  '[공통] 스퀘어 쉐입과 사이드 일직선을 정확히 맞췄는가',
+  '[공통] 길이 0.5~1cm 미만, 두께 0.5~1mm 이하 규격을 충족하는가',
+  '[공통] 적절한 타이밍에 핀칭을 주어 퍼지지 않는 C-커브(20~40%)를 만들었는가',
+  '[공통] 하이포인트 굴곡이 자연스럽게 형성되었는가',
+  '[공통] 기포 없이 맑고 투명하며, 심사 전 오일기를 완벽히 닦아냈는가',
+  '팁 부착 없이 실크 랩, 필러 파우더, 글루만 사용하여 연장했는가',
+  '프리에지 부분이 하얗게 뭉치거나 불투명해지지 않고 맑게 연장되었는가'
+ ],
+ 'removal': [
+  '클리퍼를 사용하여 연장된 인조 손톱의 프리에지를 먼저 안전하게 잘라내었는가',
+  '파일링 시 자연 손톱이나 주변 피부에 상처를 내지 않았는가',
+  '퓨어 아세톤과 호일로 감싸기 전 주변 피부 보호용 큐티클 오일을 도포했는가',
+  '인조네일 잔여물(허물)을 완벽하게 제거했는가',
+  '자연 네일을 한 방향으로 파일링하여 라운드/오발 쉐입으로 예쁘게 복구했는가',
+  '제한 시간(15분) 내에 완료되었는가'
+ ]
+};
+const SUBJECT_NAMES = {
+ 'redfull': '레드풀컬러',
+ 'french': '프렌치', 'deepfrench': '딥프렌치', 'gradation': '그라데이션',
+ 'linemarble': '선마블링', 'fanmarble': '부채꼴마블링',
+ 'acrylic': '아크릴', 'silk': '실크', 'tipwrap': '팁위드랩',
+ 'gel': '젤', 'removal': '제거'
+};
+
+/* ============ 5. STATE ============ */
+const STORAGE_KEY = 'nail_plan_state_v3_eval'; 
+let state = null;
+let selectedDay = 1;
+let saveTimeout = null;
+let runningTimer = null; 
+let tickInterval = null;
+
+function defaultDayState(dayIdx){
+ const d = PLAN[dayIdx-1];
+ return {
+ reps: d.subjects.map(s => Array(s.count).fill(false)),
+ timerRemaining: [null,null,null,null],
+ feedback: '',
+ subFeedback: ['','','',''],
+ timeLogs: [null,null,null,null],
+ taskPhotos: [['','',''],['','',''],['','',''],['','','']],
+ mockAnalysis: { setupTime: '', recovery: false, deductions: '', improvements: '' }
+ };
+}
+function defaultState(){
+ const days = {};
+ PLAN.forEach(d => days[d.day] = defaultDayState(d.day));
+ return {
+ days, stepNotes: {},
+ prepChecklist: { nipper: false, file: false, glue: false, brush: false, lamp: false, tip: false, gel: false, acrylic: false, silk: false, remover: false, sanitizer: false, towel: false, dustCollector: false },
+ evaluations: {} 
+ };
+}
+function ensureDay(day){
+ if(!state.days[day]) state.days[day] = defaultDayState(day);
+ return state.days[day];
+}
+
+let saveRetryTimeout = null;
+let saveRetryCount = 0;
+
+async function loadStateFromServer() {
+ try {
+ const res = await window.storage.get(STORAGE_KEY, false);
+ if (res && res.value) {
+ const parsed = JSON.parse(res.value);
+ Object.keys(parsed.days || {}).forEach(k => {
+ if (state.days[k]) state.days[k] = Object.assign(state.days[k], parsed.days[k]);
+ else state.days[k] = parsed.days[k];
+ });
+ if(parsed.stepNotes) state.stepNotes = parsed.stepNotes;
+ if(parsed.prepChecklist) state.prepChecklist = Object.assign(state.prepChecklist, parsed.prepChecklist);
+ if(parsed.evaluations) state.evaluations = parsed.evaluations;
+ updateAllUI();
+ }
+ } catch (e) {
+ console.warn('저장소 백그라운드 로드 실패', e);
+ }
+}
+
+function saveState(){
+ setSaveStatus('saving');
+ clearTimeout(saveTimeout);
+ saveTimeout = setTimeout(doSave, 350);
+}
+async function doSave(){
+ try{
+ const res = await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+ if(!res) throw new Error('empty response');
+ saveRetryCount = 0;
+ setSaveStatus('ok');
+ }catch(e){
+ console.error('저장 실패', e);
+ setSaveStatus('err');
+ scheduleRetry();
+ }
+}
+function scheduleRetry(){
+ clearTimeout(saveRetryTimeout);
+ saveRetryCount++;
+ const delay = Math.min(20000, 1500 * Math.pow(1.7, saveRetryCount));
+ saveRetryTimeout = setTimeout(doSave, delay);
+}
+window.retryNow = function retryNow(){
+ clearTimeout(saveRetryTimeout);
+ setSaveStatus('saving');
+ doSave();
+};
+
+function setSaveStatus(status){
+ const el = document.getElementById('saveStatusBadge');
+ if(!el) return;
+ el.classList.remove('ok','saving','err');
+ if(status==='saving'){ el.textContent = '저장 중…'; el.classList.add('saving'); }
+ else if(status==='ok'){ el.textContent = '✅ 변경사항 저장됨'; el.classList.add('ok'); }
+ else if(status==='err'){ el.textContent = '⚠ 저장 실패 · 눌러서 재시도'; el.classList.add('err'); }
+}
+function flashSaved(){
+ const el = document.getElementById('saveFlag');
+ if(!el) return;
+ el.classList.add('show');
+ clearTimeout(el._t);
+ el._t = setTimeout(()=>el.classList.remove('show'), 1400);
+}
+
+/* ============ 6. 계산 함수 ============ */
+function dayPercent(day){
+ const st = ensureDay(day);
+ let total=0, done=0;
+ st.reps.forEach(arr=>{ total+=arr.length; done+=arr.filter(Boolean).length; });
+ return total? Math.round(done/total*100) : 0;
+}
+function overallPercent(){
+ let total=0, done=0;
+ PLAN.forEach(d=>{
+ const st = ensureDay(d.day);
+ st.reps.forEach(arr=>{ total+=arr.length; done+=arr.filter(Boolean).length; });
+ });
+ return total? Math.round(done/total*100):0;
+}
+function subjectOverall(idx){
+ let total=0, done=0;
+ PLAN.forEach(d=>{
+ const st = ensureDay(d.day);
+ const arr = st.reps[idx] || [];
+ total += arr.length; done += arr.filter(Boolean).length;
+ });
+ return total? Math.round(done/total*100):0;
+}
+function perRepMinutes(day, idx){ return WEEK_MIN[weekOf(day)][idx]; }
+function perRepSeconds(day, idx){ return perRepMinutes(day, idx) * 60; }
+
+const BASE_TIME = {
+ subject1_full: 1.50, subject1_half: 0.75,
+ subject2_full: 1.33, subject2_half: 0.67,
+ subject3: 0.92, subject4: 0.42
+};
+
+function calculateDayTotal(dayPlan) {
+ const subjects = dayPlan.subjects;
+ let total = 0;
+ const details = [];
+
+ if (subjects[0]) {
+ const s = subjects[0];
+ let time = 0;
+ const name = s.name;
+ if (name.includes('풀')) {
+ const count = (name.match(/풀/g) || []).length;
+ time = count * BASE_TIME.subject1_full;
+ } else if (name.includes('축소') || name.includes('단일')) {
+ const match = name.match(/[\d.]+/);
+ const count = match ? parseFloat(match[0]) : 1;
+ time = count * BASE_TIME.subject1_half;
+ }
+ if (s.count === 0) time = 0;
+ total += time;
+ details.push({ subject: '1과목', name: s.name, time: time });
+ }
+
+ if (subjects[1]) {
+ const s = subjects[1];
+ let time = 0;
+ const name = s.name;
+ if (name.includes('합본')) {
+ const match = name.match(/[\d.]+/);
+ const count = match ? parseFloat(match[0]) : 1;
+ time = count * BASE_TIME.subject2_full;
+ } else if (name.includes('단일')) {
+ const match = name.match(/[\d.]+/);
+ const count = match ? parseFloat(match[0]) : 1;
+ time = count * BASE_TIME.subject2_half;
+ }
+ if (s.count === 0) time = 0;
+ total += time;
+ details.push({ subject: '2과목', name: s.name, time: time });
+ }
+
+ if (subjects[2]) {
+ const s = subjects[2];
+ let time = 0;
+ if (s.name !== '연장 없음' && s.count > 0) time = s.count * BASE_TIME.subject3;
+ total += time;
+ details.push({ subject: '3과목', name: s.name, time: time });
+ }
+
+ if (subjects[3]) {
+ const s = subjects[3];
+ let time = 0;
+ if (s.name !== '제거 없음' && s.count > 0) time = s.count * BASE_TIME.subject4;
+ total += time;
+ details.push({ subject: '4과목', name: s.name, time: time });
+ }
+
+ return { total: Math.round(total * 100) / 100, details: details };
+}
+
+function estimatedDayMinutes(day){
+ const d = PLAN[day-1];
+ return Math.round(calculateDayTotal(d).total * 60);
+}
+function formatMinutes(mins){
+ const h = Math.floor(mins/60), m = mins%60;
+ if(h === 0) return `${m}분`;
+ if(m === 0) return `${h}시간`;
+ return `${h}시간 ${m}분`;
+}
+function getRemaining(day, idx){
+ const st = ensureDay(day);
+ const r = st.timerRemaining[idx];
+ return (r===null || r===undefined) ? perRepSeconds(day, idx) : r;
+}
+function fmtTime(sec){
+ sec = Math.max(0, Math.round(sec));
+ const m = Math.floor(sec/60), s = sec%60;
+ return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function fmtOverTime(sec){
+ if(sec <= 0) return '00:00';
+ const m = Math.floor(sec/60), s = Math.round(sec%60);
+ return '+' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+/* ============ 7. 종목별 집계 함수 ============ */
+function aggregateCounts(){
+ const counts = {};
+ Object.keys(GOAL_COUNTS).forEach(k => counts[k] = 0);
+
+ PLAN.forEach(d => {
+ const st = ensureDay(d.day);
+ d.subjects.forEach((subj, idx) => {
+ const doneCount = st.reps[idx].filter(Boolean).length;
+ if(doneCount === 0) return;
+ const name = subj.name;
+
+ if(d.mock && MOCK_ROUNDS.some(r => r.date === d.date)) {
+ const rounds = MOCK_ROUNDS.filter(r => r.date === d.date);
+ const repeatCount = subj.count > 0 ? subj.count : 1;
+ rounds.forEach(round => {
+ const subNames = [round.sub1, round.sub2, round.sub3, round.sub4];
+ for(let i=0; i<repeatCount; i++){
+ if(idx===0){
+ if(subNames[0] && counts[subNames[0]]!==undefined) counts[subNames[0]]+=doneCount;
+ counts['레드풀컬러']+=doneCount;
+ } else if(subNames[idx] && counts[subNames[idx]]!==undefined) {
+ counts[subNames[idx]]+=doneCount;
+ }
+ }
+ });
+ return;
+ }
+
+ if(name.includes('+') || name.includes('x')) {
+ const base = name.split('x')[0].trim();
+ if(base.includes('+')) {
+ base.split('+').forEach(p => {
+ const trimmed = p.trim();
+ let mKey = Object.keys(GOAL_COUNTS).find(k => k === trimmed) || Object.keys(GOAL_COUNTS).find(k => trimmed.includes(k) || k.includes(trimmed));
+ if(mKey) {
+ const multi = parseInt(name.split('x')[1]) || 1;
+ counts[mKey] += doneCount * multi;
+ if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount*multi;
+ }
+ });
+ } else {
+ let mKey = Object.keys(GOAL_COUNTS).find(k => k === base) || Object.keys(GOAL_COUNTS).find(k => base.includes(k) || k.includes(base));
+ if(mKey) {
+ const multi = parseInt(name.split('x')[1]) || 1;
+ counts[mKey] += doneCount * multi;
+ if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount*multi;
+ }
+ }
+ return;
+ }
+
+ let mKey = Object.keys(GOAL_COUNTS).find(k => k === name) || Object.keys(GOAL_COUNTS).find(k => name.includes(k) || k.includes(name));
+ if(mKey){
+ counts[mKey] += doneCount;
+ if(idx===0 && mKey!=='레드풀컬러') counts['레드풀컬러']+=doneCount;
+ }
+ });
+ });
+ return counts;
+}
+
+/* ============ 8. RENDER 함수들 ============ */
+function ringSVG(pct, size, color, strokeW){
+ const r = (size-strokeW)/2, c = 2*Math.PI*r, off = c*(1-pct/100);
+ return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+ <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="var(--line)" stroke-width="${strokeW}" fill="none"/>
+ <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${strokeW}" fill="none"
+ stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+ </svg>`;
+}
+
+function renderApp(){
+ const app = document.getElementById('app');
+ const overall = overallPercent();
+
+ app.innerHTML = `
+ <div class="top-actions">
+ <span class="save-badge" id="saveStatusBadge">저장 준비 중…</span>
+ <button class="reset-btn" style="background:var(--blue); color:#fff; border:none; font-weight:600;" onclick="openInfoModal()">📌 시험 기준 &amp; 정답 가이드</button>
+ <button class="reset-btn" style="background:var(--purple); color:#fff; border:none; font-weight:600;" onclick="openPrepModal()">📦 시험 준비물</button>
+ <button class="reset-btn" onclick="resetAll()">전체 기록 초기화</button>
+ </div>
+ <header class="top">
+ <div>
+ <div class="brand-eyebrow">Nail Practical · 13-Day Plan</div>
+ <h1>네일 실기 13일 완성 플래너 (종합본)</h1>
+ <p>7/24(금) — 8/5(수) · 피드백, 모의고사 분석 및 종목별 점수 평가 포함</p>
+ </div>
+ <div class="overall-card">
+ <div class="overall-ring">
+ ${ringSVG(overall, 74, 'var(--blue)', 8)}
+ <div class="pct">${overall}%</div>
+ </div>
+ <div class="overall-meta">
+ <div class="label">전체 진도율</div>
+ <div class="num">13일 전체 과제 기준</div>
+ <div class="num" style="margin-top:4px;">오늘: Day ${selectedDay} · ${dayPercent(selectedDay)}% 완료</div>
+ </div>
+ </div>
+ </header>
+
+ <div class="subject-row" id="subjectRow"></div>
+
+ <section class="calendar">
+ <div class="section-head">
+ <h2>달력 · Day 1~13</h2>
+ <span class="hint">칸을 누르면 아래에 그날의 대시보드가 열려요</span>
+ </div>
+ <div id="calWeeks"></div>
+ </section>
+
+ <section class="day-panel" id="dayPanel"></section>
+
+ <!-- ====== 추가된 체크리스트 & 통계 모듈 ====== -->
+ <section class="checklist-module">
+ <div class="section-head">
+ <h2>📋 종목별 체크리스트 & 점수 평가</h2>
+ <span class="hint">오늘 연습한 종목을 선택하고 스스로 세부 항목을 평가해보세요</span>
+ </div>
+ <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
+ <select id="subjectSelector" style="padding:8px 14px; border-radius:10px; border:1px solid var(--line); font-size:13px; font-weight:600; background:#fff;">
+ <option value="">-- 종목 선택 --</option>
+ <option value="redfull">레드풀컬러</option>
+ <option value="french">프렌치</option>
+ <option value="deepfrench">딥프렌치</option>
+ <option value="gradation">그라데이션</option>
+ <option value="linemarble">선마블링</option>
+ <option value="fanmarble">부채꼴마블링</option>
+ <option value="acrylic">아크릴</option>
+ <option value="silk">실크</option>
+ <option value="tipwrap">팁위드랩</option>
+ <option value="gel">젤</option>
+ <option value="removal">제거</option>
+ </select>
+ <button onclick="startEvaluation()" class="reset-btn" style="background:var(--ink); color:#fff; border:none; padding:8px 20px; border-radius:10px; font-weight:600;">평가 시작</button>
+ <span style="font-size:12px; color:var(--ink-soft); align-self:center;">오늘 평가: <span id="todayCount" style="font-weight:700; color:var(--blue);">0</span>건</span>
+ </div>
+ <div id="checklistContainer" style="display:none; margin-top:12px;"></div>
+ <div id="scoreSummary" style="margin-top:16px; display:flex; gap:20px; flex-wrap:wrap; background:var(--surface-soft); border-radius:16px; padding:14px 18px;">
+ <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">전체 평균</span> <span id="avgScore" style="font-size:16px; font-weight:700;">-</span></div>
+ <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">최근 3회 평균</span> <span id="recentAvg" style="font-size:16px; font-weight:700;">-</span></div>
+ <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">합격 여부</span> <span id="passStatus" style="font-size:16px; font-weight:700;">-</span></div>
+ <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">평가 횟수</span> <span id="practiceCount" style="font-size:16px; font-weight:700;">-</span></div>
+ </div>
+ </section>
+
+ <section class="stats-module">
+ <div class="section-head">
+ <h2>📊 종목별 약점 분석 & 점수 추이</h2>
+ <span class="hint">자주 놓치는 항목을 확인하고 점수를 높이세요</span>
+ </div>
+ <div id="statsContainer" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+ <div>
+ <h4 style="margin:0 0 12px; font-size:14px;">과목별 평균 점수</h4>
+ <div id="subjectAvgChart"></div>
+ </div>
+ <div>
+ <h4 style="margin:0 0 12px; font-size:14px;">종목별 약점 TOP 3 (체크 누락 항목)</h4>
+ <div id="weaknessList"></div>
+ </div>
+ <div style="grid-column:1/3;">
+ <h4 style="margin:0 0 12px; font-size:14px;">전체 점수 추이 (최근 10회)</h4>
+ <div id="scoreTrendChart"></div>
+ </div>
+ </div>
+ </section>
+
+ <section class="viz">
+ <div class="section-head"><h2>📊 종목별 연습 횟수 vs 목표</h2><span class="hint">목표 대비 달성 현황</span></div>
+ <div id="itemChart"></div>
+ </section>
+ `;
+
+ renderSubjectRow();
+ renderCalendar();
+ renderDayPanel(selectedDay);
+ renderItemChart();
+ updateStatsDashboard();
+ setSaveStatus('ok');
+}
+
+function updateAllUI(){
+ renderSubjectRow();
+ renderCalendar();
+ renderDayPanel(selectedDay);
+ renderItemChart();
+ updateStatsDashboard();
+ const overall = overallPercent();
+ const ring = document.querySelector('.overall-ring');
+ if(ring) ring.innerHTML = ringSVG(overall, 74, 'var(--blue)', 8) + `<div class="pct">${overall}%</div>`;
+ const metaNum = document.querySelector('.overall-meta .num:last-child');
+ if(metaNum) metaNum.textContent = `오늘: Day ${selectedDay} · ${dayPercent(selectedDay)}% 완료`;
+}
+
+function renderSubjectRow(){
+ const el = document.getElementById('subjectRow');
+ if(!el) return;
+ el.innerHTML = SUBJECT_LABEL.map((label,i)=>{
+ const pct = subjectOverall(i);
+ return `<div class="subject-mini" style="cursor:pointer" onclick="openSubjectFeedback(${i})" title="${label} 메모 모아보기">
+ <div class="top-line">
+ <span class="name"><span class="dot" style="background:${SUBJECT_COLOR[i]}"></span>${label}</span>
+ <span class="pct" style="color:${SUBJECT_COLOR[i]}">${pct}%</span>
+ </div>
+ <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${SUBJECT_COLOR[i]}"></div></div>
+ </div>`;
+ }).join('');
+}
+
+function renderCalendar(){
+ const el = document.getElementById('calWeeks');
+ if(!el) return;
+ const weeks = [PLAN.slice(0,7), PLAN.slice(7,13)];
+ const weekTitles = ['1주차 · Day 1–7','2주차 · Day 8–13'];
+ el.innerHTML = weeks.map((wk,wi)=>{
+ return `<div class="week-label">${weekTitles[wi]}</div>
+ <div class="cal-grid">
+ ${wk.map(d=>{
+ const pct = dayPercent(d.day);
+ const lightness = 92 - (pct * 0.52);
+ const bgColor = `hsl(210, 70%, ${lightness}%)`;
+ const active = d.day===selectedDay ? 'active':'';
+ const mockCls = d.mock ? 'mock':'';
+ return `<button class="nail-cell ${active} ${mockCls}" onclick="selectDay(${d.day})" style="background:${bgColor};">
+ <div class="nail-fill" style="height:${pct}%; background:${bgColor};"></div>
+ <div class="label">
+ <div class="day-num">Day ${d.day}</div>
+ <div class="day-date">${d.date}</div>
+ <div class="day-pct">${pct}%</div>
+ </div>
+ </button>`;
+ }).join('')}
+ </div>`;
+ }).join('');
+}
+
+function selectDay(day){
+ stopRunningTimer(true);
+ selectedDay = day;
+ renderCalendar();
+ renderDayPanel(day);
+ const overallRing = document.querySelector('.overall-meta .num:last-child');
+ if(overallRing) overallRing.textContent = `오늘: Day ${selectedDay} · ${dayPercent(selectedDay)}% 완료`;
+ document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderDayPanel(day){
+ const d = PLAN[day-1];
+ const st = ensureDay(day);
+ const todayPct = dayPercent(day);
+ const panel = document.getElementById('dayPanel');
+ if(!panel) return;
+ const rounds = MOCK_ROUNDS.filter(r=>r.date===d.date);
+
+ panel.innerHTML = `
+ <div class="day-panel-head">
+ <div>
+ <h2>Day ${d.day} <span style="color:var(--ink-soft); font-weight:400; font-size:16px;">· ${d.date}</span>
+ ${d.note ? `<span class="note-chip">${d.note}</span>`:''}
+ <span class="note-chip" style="background:var(--surface-soft); color:var(--ink-soft); border:1px solid var(--line);" title="${calculateDayTotal(d).details.map(x=>`${x.subject} ${x.name}: ${Math.round(x.time*100)/100}h`).join(' / ')}">⏱ 예상 총 소요 ${formatMinutes(estimatedDayMinutes(d.day))}</span>
+ </h2>
+ <div class="date-note">오늘 할일 · 과제별 체크, 시간 기록, 피드백</div>
+ </div>
+ <div class="today-progress">
+ <div class="ring-wrap">${ringSVG(todayPct,56,'var(--purple)',6)}<div class="pct">${todayPct}%</div></div>
+ <div><div class="cap">오늘 전체<br>진도율</div></div>
+ </div>
+ </div>
+
+ ${rounds.length ? `
+ <div class="mock-box">
+ <h3>📋 엑셀 지정 모의고사 조합 (이 날짜 배정분)</h3>
+ <div class="mock-round-grid">
+ ${rounds.map(r=>`
+ <div class="mock-round-card">
+ <div class="mock-round-head"><span>${r.round}</span><span class="mock-code">${r.code}</span></div>
+ <div class="mock-round-body">
+ <div><i style="background:${SUBJECT_COLOR[0]}"></i>1과목 · ${r.sub1}</div>
+ <div><i style="background:${SUBJECT_COLOR[1]}"></i>2과목 · ${r.sub2}</div>
+ <div><i style="background:${SUBJECT_COLOR[2]}"></i>3과목 · ${r.sub3}</div>
+ <div><i style="background:${SUBJECT_COLOR[3]}"></i>4과목 · ${r.sub4}</div>
+ </div>
+ </div>
+ `).join('')}
+ </div>
+ </div>` : ''}
+
+ <div class="task-grid" id="taskGrid"></div>
+
+ ${d.mock ? `
+ <div class="mock-analysis">
+ <h4>📝 모의고사 분석</h4>
+ <div class="row">
+ <label>도구 세팅 시간(분): <input type="number" value="${st.mockAnalysis.setupTime||''}" onchange="updateMockAnalysis(${day},'setupTime',this.value)"></label>
+ <label>실수 복구: <input type="checkbox" ${st.mockAnalysis.recovery?'checked':''} onchange="updateMockAnalysis(${day},'recovery',this.checked)"> 성공</label>
+ </div>
+ <div class="row">
+ <label>감점 예상 항목: <input type="text" value="${st.mockAnalysis.deductions||''}" placeholder="예: 프렌치 라인, C커브" onchange="updateMockAnalysis(${day},'deductions',this.value)"></label>
+ </div>
+ <label>개선점</label>
+ <textarea placeholder="다음 모의고사에서 집중할 점..." onchange="updateMockAnalysis(${day},'improvements',this.value)">${st.mockAnalysis.improvements||''}</textarea>
+ </div>
+ ` : ''}
+
+ <div class="day-feedback">
+ <h3>오답노트 · 오늘의 피드백</h3>
+ <div class="sub">전체적인 만족도나 느낀 점을 자유롭게 적어보세요.</div>
+ <textarea id="dayFeedback" placeholder="예: 큐티클 정리 속도 개선 필요...">${escapeHtml(st.feedback)}</textarea>
+ <div class="feedback-actions">
+ <button onclick="copyDayFeedback(${day})">이 날 피드백 복사</button>
+ <button class="secondary" onclick="exportAllFeedback()">전체 오답노트 내보내기(.txt)</button>
+ <span class="save-flag" id="saveFlag">복사됨 ✓</span>
+ </div>
+ </div>
+ `;
+
+ document.getElementById('dayFeedback').addEventListener('input', (e)=>{ st.feedback = e.target.value; saveState(); });
+ renderTaskGrid(day);
+}
+
+function renderTaskGrid(day){
+ const d = PLAN[day-1];
+ const st = ensureDay(day);
+ const grid = document.getElementById('taskGrid');
+ if(!grid) return;
+
+ grid.innerHTML = d.subjects.map((subj, idx)=>{
+ const reps = st.reps[idx];
+ const donePct = reps.length? Math.round(reps.filter(Boolean).length/reps.length*100):0;
+ const perRepMin = perRepMinutes(day, idx);
+ const isRunning = runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.status === 'running';
+ const isFinished = runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.status === 'finished';
+ let displayText = '', isOver = false, overSec = 0;
+
+ if(isRunning){
+ const left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+ displayText = fmtTime(left);
+ } else if(isFinished){
+ const elapsed = (Date.now() - runningTimer.finishedAt) / 1000;
+ overSec = elapsed; displayText = fmtOverTime(elapsed); isOver = true;
+ } else {
+ const remainStored = getRemaining(day, idx);
+ displayText = remainStored <= 0 ? '시간 종료' : fmtTime(remainStored);
+ }
+
+ const timeLog = st.timeLogs[idx] || '';
+ let compareText = '', compareClass = '';
+ if(timeLog !== '' && timeLog !== null) {
+ const actual = parseFloat(timeLog);
+ if(!isNaN(actual)) {
+ const diff = actual - perRepMin;
+ if(diff > 0) { compareText = `+${diff.toFixed(1)}분 초과`; compareClass = 'bad'; } 
+ else if(diff < 0) { compareText = `${diff.toFixed(1)}분 단축`; compareClass = 'good'; } 
+ else { compareText = '정확히 일치'; compareClass = 'good'; }
+ }
+ }
+
+ const taskPhotos = st.taskPhotos || [['','',''],['','',''],['','',''],['','','']];
+ let photoArr = taskPhotos[idx];
+ if(!Array.isArray(photoArr)) photoArr = [photoArr || '', '', ''];
+ const previewUrl0 = getDriveImageUrl(photoArr[0]);
+ const previewUrl1 = getDriveImageUrl(photoArr[1]);
+ const previewUrl2 = getDriveImageUrl(photoArr[2]);
+
+ return `<div class="task-card">
+ <span class="subj-tag" style="background:${SUBJECT_COLOR[idx]}">${SUBJECT_LABEL[idx]}</span>
+ <p class="content-name">${subj.name}</p>
+ ${(() => {
+ const dayTotal = calculateDayTotal(d);
+ const subjectTime = dayTotal.details[idx] ? dayTotal.details[idx].time : 0;
+ return subjectTime > 0 ? `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간</div>` : '';
+ })()}
+ <div class="target-line">목표 ${subj.count}회 · 회당 목표 ${perRepMin}분</div>
+ <div class="reps">
+ ${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${SUBJECT_COLOR[idx]};`:''}" onclick="toggleRep(${day},${idx},${ri})">${done? '✓' : ri+1}</button>`).join('')}
+ </div>
+ <div class="task-mini-track"><div class="task-mini-fill" style="width:${donePct}%; background:${SUBJECT_COLOR[idx]}"></div></div>
+ <div class="time-log-row">
+ <label>실제 소요(분):</label>
+ <input type="number" min="0" step="0.5" value="${timeLog}" placeholder="분" onchange="updateTimeLog(${day},${idx},this.value)">
+ ${compareText ? `<span class="compare ${compareClass}">${compareText}</span>` : ''}
+ </div>
+ <div class="timer-row">
+ <div><div class="t-target">회당 ${perRepMin}분 타이머</div><div class="t-elapsed ${isOver?'over':''}" id="elapsed-${idx}">${displayText}</div></div>
+ <div class="timer-btns">
+ ${isRunning ? `<button onclick="openVisualTimer()">타이머 열기</button><button onclick="pauseTimer(${day},${idx})">일시정지</button>` : isFinished ? `<button onclick="openVisualTimer()">타이머 열기</button><button onclick="startTimer(${day},${idx})">다시 시작</button>` : `<button onclick="openVisualTimer(${day},${idx})">타이머 열기</button><button onclick="startTimer(${day},${idx})">${displayText === '시간 종료' ? '다시 시작':'시작'}</button>`}
+ <button class="secondary" onclick="resetTimer(${day},${idx})">초기화</button>
+ </div>
+ </div>
+ 
+ <div class="task-photo" style="margin-top:8px; margin-bottom:12px; background:#fff; padding:10px 12px; border-radius:10px; border:1px solid var(--line);">
+ <label style="font-size:11px; font-weight:700; color:var(--ink); display:block; margin-bottom:6px;">📸 작품 사진 (정면 / 측면 / 45도)</label>
+ <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+ <div>
+ <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="정면 링크" value="${escapeHtml(photoArr[0])}" onchange="updateTaskPhoto(${day},${idx},0,this.value)">
+ ${previewUrl0 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl0}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">정면</div>`}
+ </div>
+ <div>
+ <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="측면 링크" value="${escapeHtml(photoArr[1])}" onchange="updateTaskPhoto(${day},${idx},1,this.value)">
+ ${previewUrl1 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl1}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">측면</div>`}
+ </div>
+ <div>
+ <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="45도 링크" value="${escapeHtml(photoArr[2])}" onchange="updateTaskPhoto(${day},${idx},2,this.value)">
+ ${previewUrl2 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl2}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">45도</div>`}
+ </div>
+ </div>
+ </div>
+
+ <div class="subfeedback">
+ <label>이 과제 메모</label>
+ <textarea placeholder="종목별 피드백..." oninput="updateSubFeedback(${day},${idx}, this.value)">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
+ </div>
+ </div>`;
+ }).join('');
+}
+
+/* ============ 9. 차트 렌더링 ============ */
+function renderItemChart(){
+ const el = document.getElementById('itemChart');
+ if(!el) return;
+ const counts = aggregateCounts();
+ const groups = { '1과목': ['레드풀컬러', '프렌치', '딥프렌치', '화이트그라데이션'], '2과목': ['선마블링', '부채꼴마블링'], '3과목': ['내추럴팁위드랩', '젤원톤스컬프쳐', '아크릴프렌치스컬프쳐', '실크연장'], '4과목': ['제거'] };
+ const groupColors = { '1과목': 'var(--blue)', '2과목': 'var(--coral)', '3과목': 'var(--purple)', '4과목': 'var(--lime)' };
+ 
+ let html = '<div class="viz-grid">';
+ Object.keys(groups).forEach((label) => {
+ const items = groups[label];
+ const smallClass = (label === '2과목' || label === '4과목') ? ' small-padding' : '';
+ html += `<div class="chart-group${smallClass}">`;
+ html += `<div class="chart-group-title"><span class="dot" style="background:${groupColors[label]}"></span>${label}</div>`;
+ items.forEach(itemName => {
+ const achieved = counts[itemName] || 0;
+ const goal = GOAL_COUNTS[itemName] || 1;
+ const pct = Math.min(100, Math.round((achieved / goal) * 100));
+ const over = achieved > goal ? achieved - goal : 0;
+ html += `<div class="chart-item"><span class="name">${itemName}</span><div class="bar-wrap"><div class="bar-fill" style="width:${Math.min(100, pct)}%; background:${groupColors[label]};"></div>`;
+ if(over > 0) html += `<div class="bar-over" style="width:${Math.min(100, (over/goal)*100)}%;"></div>`;
+ html += `</div><div class="label"><span class="achieved">${achieved}</span> / <span class="goal">${goal}</span>${over>0 ? ` <span class="over">(+${over})</span>` : ''}</div></div>`;
+ });
+ html += `</div>`;
+ });
+ html += `</div>`;
+ el.innerHTML = html;
+}
+
+/* ============ 9-2. 평가 모듈 로직 ============ */
+function startEvaluation() {
+ const subjKey = document.getElementById('subjectSelector').value;
+ if(!subjKey) { alert('종목을 먼저 선택해주세요.'); return; }
+ const criteria = EVAL_CRITERIA[subjKey];
+ 
+ let html = `<div style="background:#fff; padding:20px; border-radius:16px; border:1px solid var(--line);">
+ <h4 style="margin:0 0 8px; font-size:15px; color:var(--ink);">✔️ ${SUBJECT_NAMES[subjKey]} 체크리스트</h4>
+ <p style="font-size:11.5px; color:var(--ink-soft); margin-top:0; margin-bottom:16px;">잘 수행한 항목에만 체크하세요. (체크되지 않은 항목은 약점으로 기록됩니다.)</p>`;
+ 
+ criteria.forEach((c, idx) => {
+ html += `<label style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; font-size:13px; cursor:pointer; background:var(--surface-soft); padding:10px 14px; border-radius:10px;">
+ <input type="checkbox" id="chkEval_${idx}" style="width:18px; height:18px; flex-shrink:0; accent-color:var(--blue); margin-top:2px;">
+ <span style="line-height:1.4;">${c}</span>
+ </label>`;
+ });
+ html += `<div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+ <button class="reset-btn" onclick="document.getElementById('checklistContainer').style.display='none'">취소</button>
+ <button class="reset-btn" onclick="saveEvaluation('${subjKey}')" style="background:var(--blue); color:#fff; font-weight:700; border:none; padding:8px 24px; border-radius:10px;">결과 저장</button>
+ </div></div>`;
+ 
+ const container = document.getElementById('checklistContainer');
+ container.innerHTML = html;
+ container.style.display = 'block';
+}
+
+function saveEvaluation(subjKey) {
+ const criteria = EVAL_CRITERIA[subjKey];
+ let score = 0;
+ let weaknesses = [];
+ const pointPerItem = 100 / criteria.length;
+
+ criteria.forEach((c, idx) => {
+ if(document.getElementById(`chkEval_${idx}`).checked) { score += pointPerItem; } 
+ else { 
+ weaknesses.push(c.replace(/\[.*?\]\s*/, '')); 
+ }
+ });
+
+ if(!state.evaluations) state.evaluations = {};
+ if(!state.evaluations[subjKey]) state.evaluations[subjKey] = [];
+
+ state.evaluations[subjKey].push({
+ date: new Date().toLocaleDateString(),
+ timestamp: Date.now(),
+ score: Math.round(score),
+ weaknesses: weaknesses
+ });
+
+ saveState();
+ updateStatsDashboard();
+ alert(`평가가 완료되었습니다. (점수: ${Math.round(score)}점)`);
+ document.getElementById('checklistContainer').style.display = 'none';
+}
+
+function updateStatsDashboard() {
+ if(!state.evaluations) return;
+ let totalScore = 0, evalCount = 0, todayCnt = 0;
+ let allScores = [], allWeaknesses = {};
+ let subjAvgHTML = '';
+ const todayStr = new Date().toLocaleDateString();
+ const subjects = Object.keys(state.evaluations);
+
+ subjects.forEach(subjKey => {
+ const evals = state.evaluations[subjKey];
+ if(!evals || evals.length === 0) return;
+ let subjTotal = 0;
+ evals.forEach(e => {
+ subjTotal += e.score; totalScore += e.score; evalCount++;
+ allScores.push({ subj: SUBJECT_NAMES[subjKey], ...e });
+ if(e.date === todayStr) todayCnt++;
+ e.weaknesses.forEach(w => { allWeaknesses[w] = (allWeaknesses[w] || 0) + 1; });
+ });
+ const subjAvg = Math.round(subjTotal / evals.length);
+ subjAvgHTML += `
+ <div style="display:flex; align-items:center; margin-bottom:10px; font-size:12.5px;">
+ <span style="width:75px; font-weight:600;">${SUBJECT_NAMES[subjKey]}</span>
+ <div style="flex:1; background:var(--surface-soft); height:14px; border-radius:10px; overflow:hidden; margin:0 12px; position:relative;">
+ <div style="width:${subjAvg}%; height:100%; background:var(--blue); border-radius:10px;"></div>
+ </div>
+ <span style="width:36px; text-align:right; font-weight:700;">${subjAvg}점</span>
+ </div>`;
+ });
+
+ document.getElementById('todayCount').innerText = todayCnt;
+
+ if(evalCount === 0) {
+ document.getElementById('subjectAvgChart').innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">아직 평가 데이터가 없습니다.</div>';
+ document.getElementById('scoreTrendChart').innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">데이터가 없습니다.</div>';
+ document.getElementById('weaknessList').innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">데이터가 없습니다.</div>';
+ return;
+ }
+
+ document.getElementById('subjectAvgChart').innerHTML = subjAvgHTML;
+
+ const avg = Math.round(totalScore / evalCount);
+ document.getElementById('avgScore').innerText = avg + '점';
+ document.getElementById('practiceCount').innerText = evalCount + '회';
+ document.getElementById('passStatus').innerText = avg >= 60 ? '🟢 합격권' : '🔴 노력 필요';
+
+ allScores.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+ const sortedScores = allScores.slice().reverse();
+ const recent3 = sortedScores.slice(0, 3);
+ const r3Avg = Math.round(recent3.reduce((s, e) => s + e.score, 0) / recent3.length);
+ document.getElementById('recentAvg').innerText = r3Avg + '점';
+
+ const sortedWeaknesses = Object.keys(allWeaknesses).sort((a,b) => allWeaknesses[b] - allWeaknesses[a]).slice(0,3);
+ document.getElementById('weaknessList').innerHTML = sortedWeaknesses.length > 0 
+ ? sortedWeaknesses.map((w, i) => `<div style="font-size:12px; margin-bottom:8px; background:var(--coral-soft); color:var(--coral); padding:8px 12px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:6px;"><span>🚨</span> ${w}</div>`).join('') 
+ : `<div style="font-size:12px; color:var(--ink-soft);">완벽합니다! 특별한 약점이 발견되지 않았습니다.</div>`;
+
+ const trendData = allScores.slice(-10);
+ let trendHTML = `<div style="display:flex; align-items:flex-end; gap:8px; height:120px; padding:10px 0 0; background:var(--surface-soft); border-radius:12px; padding-left:14px; padding-right:14px;">`;
+ trendData.forEach(e => {
+ trendHTML += `<div style="flex:1; display:flex; flex-direction:column; align-items:center;" title="${e.subj} (${e.score}점)">
+ <span style="font-size:10px; font-weight:700; color:var(--ink); margin-bottom:4px;">${e.score}</span>
+ <div style="width:100%; max-width:26px; background:var(--purple); border-radius:6px 6px 0 0; height:${e.score}%; transition:height 0.3s ease;"></div>
+ </div>`;
+ });
+ trendHTML += `</div><div style="font-size:11px; color:var(--ink-soft); text-align:right; margin-top:6px;">최근 10회 기준 (가장 오른쪽이 최신)</div>`;
+ document.getElementById('scoreTrendChart').innerHTML = trendHTML;
+}
+
+/* ============ 10. 타이머 관련 함수 ============ */
+function playBeepAlert(){
+ try{
+ const AudioCtx = window.AudioContext || window.webkitAudioContext;
+ if(!AudioCtx) return;
+ const ctx = new AudioCtx();
+ const count = 5, duration = 1.5, interval = 0.8, frequency = 880, volume = 0.8;
+ for(let i = 0; i < count; i++){
+ const delay = i * (duration + interval);
+ const osc = ctx.createOscillator(), gain = ctx.createGain();
+ osc.connect(gain); gain.connect(ctx.destination);
+ osc.frequency.setValueAtTime(frequency, ctx.currentTime + delay);
+ gain.gain.setValueAtTime(0.001, ctx.currentTime + delay);
+ gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + delay + 0.05);
+ gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+ osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + duration);
+ }
+ }catch(e){}
+}
+
+function startTimer(day, idx){
+ stopRunningTimer(true);
+ let remaining = getRemaining(day, idx);
+ if(remaining<=0) remaining = perRepSeconds(day, idx);
+ runningTimer = { day, idx, startedAt: Date.now(), duration: remaining, totalTarget: perRepSeconds(day, idx), name: PLAN[day-1].subjects[idx].name, status: 'running' };
+ renderTaskGrid(day); openVisualTimer(); clearInterval(tickInterval);
+ tickInterval = setInterval(()=>{
+ if(!runningTimer) return;
+ if(runningTimer.status === 'finished'){
+ const overSec = (Date.now() - runningTimer.finishedAt) / 1000;
+ const el = document.getElementById('elapsed-'+idx);
+ if(el) el.textContent = fmtOverTime(overSec);
+ updateVisualTimerUI(0, overSec);
+ return;
+ }
+ const left = runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000;
+ const el = document.getElementById('elapsed-'+idx);
+ if(left <= 0){
+ runningTimer.status = 'finished'; runningTimer.finishedAt = Date.now();
+ const st = ensureDay(day); st.timerRemaining[idx] = 0; saveState(); playBeepAlert(); openVisualTimer(); renderTaskGrid(day); return;
+ }
+ if(el){ el.textContent = fmtTime(left); el.classList.toggle('danger', left<=10); }
+ updateVisualTimerUI(left);
+ }, 250);
+}
+
+function pauseTimer(day, idx){
+ if(runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.status === 'running'){
+ const st = ensureDay(day);
+ st.timerRemaining[idx] = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+ runningTimer = null; clearInterval(tickInterval); saveState(); renderTaskGrid(day); closeVisualTimer();
+ }
+}
+
+function stopRunningTimer(save){
+ if(runningTimer){
+ const {day, idx, status} = runningTimer;
+ const st = ensureDay(day);
+ if(status === 'running') st.timerRemaining[idx] = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+ else st.timerRemaining[idx] = null;
+ runningTimer = null; clearInterval(tickInterval); if(save) saveState(); closeVisualTimer();
+ }
+}
+
+function resetTimer(day, idx){
+ if(runningTimer && runningTimer.day===day && runningTimer.idx===idx){
+ runningTimer = null; clearInterval(tickInterval); closeVisualTimer();
+ }
+ ensureDay(day).timerRemaining[idx] = null; saveState(); renderTaskGrid(day);
+}
+
+function openVisualTimer(day, idx){
+ const root = document.getElementById('visualTimerRoot');
+ if(runningTimer){
+ let left = 0, overSec = 0;
+ if(runningTimer.status === 'running') left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+ else overSec = (Date.now() - (runningTimer.finishedAt || Date.now())) / 1000;
+ root.innerHTML = `
+ <div class="visual-timer-overlay" onclick="if(event.target===this) closeVisualTimer()">
+ <div class="visual-timer-box">
+ <h3>${escapeHtml(runningTimer.name)}</h3>
+ <div class="vt-sub">${runningTimer.status === 'running' ? '회당 목표시간 기준 · 남은시간만큼 색이 채워집니다' : '⏰ 시간이 종료되었습니다'}</div>
+ <div class="visual-timer-body">
+ <div class="timer-steps"><div class="timer-steps-label">📝Steps</div><textarea id="vStepsText" placeholder="예) 1. 소독 & 준비..."></textarea></div>
+ <div class="timer-clock-col"><div class="visual-clock" id="vClock"><div class="visual-clock-face" id="vClockFace"></div><div class="visual-clock-knob"></div></div><div class="visual-time-text ${runningTimer.status === 'finished' ? 'over' : ''}" id="vTimeText">${runningTimer.status === 'running' ? fmtTime(left) : fmtOverTime(overSec)}</div></div>
+ </div>
+ <div class="visual-timer-actions">
+ ${runningTimer.status === 'running' ? `<button class="gold" onclick="pauseTimer(${runningTimer.day},${runningTimer.idx})">일시정지</button>` : ''}
+ <button class="ghost" onclick="closeVisualTimer()">닫기</button>
+ </div>
+ </div></div>`;
+ const stepsEl = document.getElementById('vStepsText');
+ if(stepsEl){ stepsEl.value = loadStepNotes(runningTimer.name); stepsEl.oninput = ()=> saveStepNotes(runningTimer.name, stepsEl.value); }
+ updateVisualTimerUI(left, overSec); return;
+ }
+
+ if(typeof day === 'undefined' || typeof idx === 'undefined') return;
+ const name = PLAN[day-1].subjects[idx].name;
+ const remain = getRemaining(day, idx), target = perRepSeconds(day, idx);
+ const pct = target>0 ? Math.max(0, Math.min(100, (remain/target)*100)) : 0;
+ const isPaused = remain > 0 && remain < target;
+
+ root.innerHTML = `
+ <div class="visual-timer-overlay" onclick="if(event.target===this) closeVisualTimer()">
+ <div class="visual-timer-box">
+ <h3>${escapeHtml(name)}</h3>
+ <div class="vt-sub">${remain<=0 ? '⏰ 시간이 종료되었습니다' : (isPaused ? '⏸ 일시정지된 상태입니다' : '아직 시작 전입니다')}</div>
+ <div class="visual-timer-body">
+ <div class="timer-steps"><div class="timer-steps-label">📝 Steps</div><textarea id="vStepsText" placeholder="예) 1. 소독 & 준비..."></textarea></div>
+ <div class="timer-clock-col"><div class="visual-clock" id="vClock"><div class="visual-clock-face" id="vClockFace" style="background:conic-gradient(var(--blue) 0% ${pct}%, #e2e8f0 ${pct}% 100%)"></div><div class="visual-clock-knob"></div></div><div class="visual-time-text" id="vTimeText">${remain<=0 ? '시간 종료' : fmtTime(remain)}</div></div>
+ </div>
+ <div class="visual-timer-actions">
+ <button class="gold" onclick="startTimer(${day},${idx})">${isPaused ? '이어서 시작' : '시작'}</button>
+ <button class="ghost" onclick="closeVisualTimer()">닫기</button>
+ </div>
+ </div></div>`;
+ const stepsEl = document.getElementById('vStepsText');
+ if(stepsEl){ stepsEl.value = loadStepNotes(name); stepsEl.oninput = ()=> saveStepNotes(name, stepsEl.value); }
+}
+
+function loadStepNotes(name){
+ if(!state.stepNotes) state.stepNotes = {};
+ if(!state.stepNotes[name]) { try { const old = localStorage.getItem('stepNotes::'+name); if(old) { state.stepNotes[name] = old; saveState(); } } catch(e) {} }
+ return state.stepNotes[name] || '';
+}
+function saveStepNotes(name, val){
+ if(!state.stepNotes) state.stepNotes = {};
+ state.stepNotes[name] = val; saveState(); 
+}
+
+function updateVisualTimerUI(left, overSec){
+ const face = document.getElementById('vClockFace'), txt = document.getElementById('vTimeText');
+ if(!face || !txt || !runningTimer) return;
+ if(runningTimer.status === 'running'){
+ txt.textContent = fmtTime(left);
+ const pct = Math.max(0, Math.min(100, (left / runningTimer.totalTarget) * 100));
+ face.style.background = `conic-gradient(var(--blue) 0% ${pct}%, #e2e8f0 ${pct}% 100%)`;
+ } else {
+ txt.textContent = fmtOverTime(overSec || 0);
+ face.style.background = `conic-gradient(var(--coral) 0% 100%, #e2e8f0 100% 100%)`;
+ }
+}
+function closeVisualTimer(){ document.getElementById('visualTimerRoot').innerHTML = ''; }
+
+/* ============ 11. 기타 인터렉션 ============ */
+function toggleRep(day, idx, repIdx){
+ const st = ensureDay(day); st.reps[idx][repIdx] = !st.reps[idx][repIdx]; saveState(); updateAllUI();
+}
+function updateSubFeedback(day, idx, val){ ensureDay(day).subFeedback[idx] = val; saveState(); }
+function updateTimeLog(day, idx, val){ ensureDay(day).timeLogs[idx] = val === '' ? null : parseFloat(val); saveState(); renderTaskGrid(day); }
+
+function updateTaskPhoto(day, idx, photoIdx, val){
+ const st = ensureDay(day);
+ if(!st.taskPhotos) st.taskPhotos = [['','',''],['','',''],['','',''],['','','']];
+ if(!Array.isArray(st.taskPhotos[idx])) st.taskPhotos[idx] = [st.taskPhotos[idx]||'','',''];
+ st.taskPhotos[idx][photoIdx] = val.trim();
+ saveState();
+ renderTaskGrid(day); 
+}
+
+function updateMockAnalysis(day, field, val){ 
+ const st = ensureDay(day);
+ if(field === 'recovery') st.mockAnalysis.recovery = val; else st.mockAnalysis[field] = val;
+ saveState();
+}
+
+function copyDayFeedback(day){
+ const d = PLAN[day-1], st = ensureDay(day);
+ let text = `[Day ${d.day} · ${d.date}] 오답노트\n전체 피드백: ${st.feedback||'(없음)'}\n`;
+ d.subjects.forEach((s,i)=>{ text += `- ${SUBJECT_LABEL[i]} (${s.name}): ${st.subFeedback[i]||'(없음)'}\n`; });
+ navigator.clipboard.writeText(text).then(()=>flashSaved()).catch(()=>alert('복사에 실패했어요.'));
+}
+
+function exportAllFeedback(){
+ let text = `네일 실기 13일 완성 플랜 · 오답노트 모음\n생성일: ${new Date().toLocaleString()}\n\n`;
+ PLAN.forEach(d=>{
+ const st = ensureDay(d.day);
+ const hasContent = st.feedback || st.subFeedback.some(f=>f);
+ if(!hasContent) return;
+ text += `[Day ${d.day} · ${d.date}]\n`;
+ if(st.feedback) text += `전체: ${st.feedback}\n`;
+ d.subjects.forEach((s,i)=>{ if(st.subFeedback[i]) text += `- ${SUBJECT_LABEL[i]}(${s.name}): ${st.subFeedback[i]}\n`; });
+ text += `\n`;
+ });
+ if(text.trim().endsWith('모음')){ alert('아직 작성된 피드백이 없어요.'); return; }
+ const blob = new Blob([text], {type:'text/plain;charset=utf-8'}), a = document.createElement('a');
+ a.href = URL.createObjectURL(blob); a.download = '네일실기_오답노트.txt'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+async function resetAll(){
+ if(!confirm('저장된 모든 체크/시간/평가 기록을 초기화할까요? 되돌릴 수 없어요.')) return;
+ state = defaultState();
+ try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state), false); }catch(e){}
+ renderApp();
+}
+
+function openSubjectFeedback(idx){
+ const label = SUBJECT_LABEL[idx], pct = subjectOverall(idx), entries = [];
+ PLAN.forEach(d=>{
+ const st = ensureDay(d.day), note = (st.subFeedback[idx]||'').trim();
+ if(note) entries.push({day:d.day, date:d.date, content:d.subjects[idx].name, note});
+ });
+ const modalRoot = document.getElementById('modalRoot');
+ modalRoot.innerHTML = `
+ <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+ <div class="modal-box">
+ <div class="modal-head">
+ <div><h3><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${SUBJECT_COLOR[idx]};margin-right:7px;"></span>${label} 메모 모아보기</h3></div>
+ <button class="modal-close" onclick="closeModal()">✕</button>
+ </div>
+ <div class="modal-sub">누적 달성률 <span class="modal-pct" style="color:${SUBJECT_COLOR[idx]}">${pct}%</span> · 남긴 메모 ${entries.length}건</div>
+ ${entries.length ? entries.map(e=>`<div class="memo-item" style="border-color:${SUBJECT_COLOR[idx]}"><div class="memo-day">Day ${e.day} · ${e.date}</div><div class="memo-content">${escapeHtml(e.content)}</div><div class="memo-text">${escapeHtml(e.note)}</div></div>`).join('') : `<div class="modal-empty">아직 남긴 메모가 없어요.</div>`}
+ ${entries.length ? `<div class="feedback-actions" style="margin-top:6px;"><button class="secondary" onclick="copySubjectFeedback(${idx})">이 목록 복사</button></div>` : ''}
+ </div></div>`;
+}
+function copySubjectFeedback(idx){
+ const label = SUBJECT_LABEL[idx];
+ let text = `[${label}] 메모 모음 (누적 달성률 ${subjectOverall(idx)}%)\n\n`;
+ PLAN.forEach(d=>{
+ const note = (ensureDay(d.day).subFeedback[idx]||'').trim();
+ if(note) text += `Day ${d.day} · ${d.date} (${d.subjects[idx].name}): ${note}\n`;
+ });
+ navigator.clipboard.writeText(text).catch(()=>alert('복사에 실패했어요.'));
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+
+/* ============ 12. 사진 갤러리 ============ */
+const PHOTO_DRIVE_IDS = {
+ m_red: "1nMQKywpYii6aU2HOkR9FLMWqL1RFyiWM", m_french: "1ZbtMGkHa80e-Z4PJB-51Kz1nYXdM_7j_", m_tipwrap: "1439KzyGRRJTZs4Mb7MhCX9hewfHxzm-x", m_gradation: "1RgZ3hKRPRsnkZKubpnZ3a6-W6a7g4YDr",
+ p_red: "1H-2MonuzmU7my9rYKzKtUtqXsQgvFoQ2", p_tipwrap: "1VZpVRtOUrPptU10IG7s50rJEO8dx6S1Z", p_gradation: "1ZLazF8wav2eTGD_EAGeVBXP2Rijjcxwz",
+ g_red: "1nscfR1q0FmRpEmm8AvH_ySG6WdzsTgJw", g_tipwrap: "1UhKZpJdJeYaQQrKEbNgWDA1NIjeh5vr4",
+ a_natural: "14ZbhmF_M1GS1TePG8gibJf2JwECPSFR5", a_gel: "1xyj2Yzuf6g0L1vENgBuf_g5Yu0wdjBLa", a_acrylic: "1_VGkQC0DVjNNK4t4ixmpEhCTzzpiTtRy", a_silk: "1Whq9kfAjDmFQREPCKWWRVPzrnTbCsTVq",
+ a_common1: "1B4X4GisTjBxdN9H9JNlE8BGgPpsmlPtO", a_common2: "1tQMGU4niijaFB9XJKO3fWjXQzWeXkO0r", a_common3: "1zvsZofnm1HGT-6IS_LTP0ZIyT2h0Vrnq"
+};
+const PHOTO_ITEMS = [
+ {id:'m_red', taskIdx:0, taskLabel:'제1과제 · 매니큐어', name:'레드풀컬러', desc:'풀컬러 시술 · 얼룩·들뜸 없이 균일하게'},
+ {id:'m_french', taskIdx:0, taskLabel:'제1과제 · 매니큐어', name:'프렌치', desc:'스마일라인 0.3~0.5cm, 좌우 대칭'},
+ {id:'m_tipwrap', taskIdx:0, taskLabel:'제1과제 · 매니큐어', name:'딥프렌치', desc:'스마일라인 1/2 이상 시술'},
+ {id:'m_gradation', taskIdx:0, taskLabel:'제1과제 · 매니큐어', name:'화이트그라데이션', desc:'경계선이 자연스럽게 이어지도록 블렌딩'},
+ {id:'p_red', taskIdx:0, taskLabel:'제1과제 · 페디큐어', name:'레드풀컬러', desc:'풀컬러 시술 · 얼룩·들뜸 없이 균일하게'},
+ {id:'p_tipwrap', taskIdx:0, taskLabel:'제1과제 · 페디큐어', name:'딥프렌치', desc:'스마일라인 1/2 이상 시술'},
+ {id:'p_gradation', taskIdx:0, taskLabel:'제1과제 · 페디큐어', name:'화이트그라데이션', desc:'경계선이 자연스럽게 이어지도록 블렌딩'},
+ {id:'g_red', taskIdx:1, taskLabel:'제2과제 · 젤매니큐어', name:'선마블링', desc:'스마일라인 1/2 이상 시술'},
+ {id:'g_tipwrap', taskIdx:1, taskLabel:'제2과제 · 젤매니큐어', name:'부채꼴마블링', desc:'젤 두께 균일 · 경화 후 들뜸 없이'},
+ {id:'a_natural', taskIdx:2, taskLabel:'제3과제 · 인조네일', name:'내추럴팁위드랩', desc:'프리에지 0.5~1mm · 연장길이 좌우 0.5~1cm'},
+ {id:'a_gel', taskIdx:2, taskLabel:'제3과제 · 인조네일', name:'젤원톤스컬프쳐', desc:'프리에지 0.5~1mm · C-커브 20~40%'},
+ {id:'a_acrylic', taskIdx:2, taskLabel:'제3과제 · 인조네일', name:'아크릴프렌치스컬프쳐', desc:'프리에지 0.5~1mm · 좌우 대칭 형태'},
+ {id:'a_silk', taskIdx:2, taskLabel:'제3과제 · 인조네일', name:'실크연장', desc:'실크 부착 들뜸 없이 · 연장길이 편차 0.5~1cm 이내'}
+];
+
+function getDriveImageUrl(input) {
+ if (!input) return null;
+ let fileId = String(input).trim();
+ if (!fileId || fileId.includes("구글_")) return null;
+
+ const match = fileId.match(/\/d\/([a-zA-Z0-9_-]+)/);
+ if (match) fileId = match[1];
+
+ if (!/^[a-zA-Z0-9_-]{15,}$/.test(fileId)) return null;
+
+ return `https://drive.google.com/file/d/${fileId}/preview`;
+}
+
+function renderPhotoGallery(){
+ const root = document.getElementById('photoGalleryRoot');
+ if (!root) return;
+ const groups = {};
+ PHOTO_ITEMS.forEach(item => { if (!groups[item.taskLabel]) groups[item.taskLabel] = []; groups[item.taskLabel].push(item); });
+ let galleryHtml = `<div class="photo-fb-banner ok">🔗 구글 드라이브 정답 가이드가 연동되었습니다.</div>`;
+
+ Object.keys(groups).forEach(taskLabel => {
+ const items = groups[taskLabel];
+ const colorHex = SUBJECT_COLOR_HEX[items[0].taskIdx] || '#4A6FA5';
+ galleryHtml += `<div class="photo-group"><div class="photo-group-title"><span class="dot" style="background:${colorHex};"></span>${taskLabel}</div>`;
+ if (taskLabel.includes('제3과제')) {
+ galleryHtml += `<div class="common-guide"><div style="font-weight:600; margin-bottom:10px; font-size:14px; color:var(--purple);">⭐ 제3과제 공통 가이드</div><div class="photo-grid">`;
+ [1, 2, 3].map(num => {
+ const imgUrl = getDriveImageUrl(PHOTO_DRIVE_IDS[`a_common${num}`]);
+ galleryHtml += `<div class="photo-card"><div class="photo-slot" style="cursor: default;">${imgUrl ? `<div onclick="window.open('${imgUrl}', '_blank')" style="width:100%; height:100%; cursor:pointer;"><iframe src="${imgUrl}" style="width:100%; height:100%; border:none; pointer-events:none;" allow="encrypted-media; fullscreen" sandbox="allow-scripts allow-same-origin"></iframe></div>` : `<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--ink-soft); font-size:11px;">준비 중</div>`}</div><div class="photo-desc">공통 가이드 ${num}</div></div>`;
+ });
+ galleryHtml += `</div></div>`;
+ }
+ galleryHtml += `<div class="photo-grid">`;
+ items.forEach(item => {
+ const imgUrl = getDriveImageUrl(PHOTO_DRIVE_IDS[item.id]);
+ galleryHtml += `<div class="photo-card"><div class="photo-slot" style="cursor: default;">${imgUrl ? `<div onclick="window.open('${imgUrl}', '_blank')" style="width:100%; height:100%; cursor:pointer;"><iframe src="${imgUrl}" style="width:100%; height:100%; border:none; pointer-events:none;" allow="encrypted-media" sandbox="allow-scripts allow-same-origin"></iframe></div>` : `<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--ink-soft); font-size:11px;">준비 중</div>`}</div><div class="photo-name">${escapeHtml(item.name)}</div><div class="photo-desc">${escapeHtml(item.desc)}</div></div>`;
+ });
+ galleryHtml += `</div></div>`;
+ });
+ root.innerHTML = galleryHtml;
+}
+
+/* ============ 13. 정보 모달 ============ */
+function openInfoModal(){
+ const modalRoot = document.getElementById('modalRoot');
+ modalRoot.innerHTML = `
+ <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+ <div class="info-modal-box">
+ <div class="modal-head">
+ <h3 style="font-size:20px;">📌 과목별 기본정보 &amp; 합격 가이드 (2026 ver.)</h3>
+ <button class="modal-close" onclick="closeModal()">✕</button>
+ </div>
+ <div class="modal-sub">엑셀 「과목별 기본정보(감점 내용 포함)」 시트 원본 기준 · 최신 정보로 업데이트</div>
+
+ <div class="info-tabs">
+ <button class="info-tab-btn active" data-tab="0" onclick="switchInfoTab(0,this)">기본정보 · 합격기준</button>
+ <button class="info-tab-btn" data-tab="1" onclick="switchInfoTab(1,this)">세부종목 안내</button>
+ <button class="info-tab-btn" data-tab="2" onclick="switchInfoTab(2,this)">감점·실격 기준</button>
+ <button class="info-tab-btn" data-tab="3" onclick="switchInfoTab(3,this)">자주 하는 실수 TOP10</button>
+ <button class="info-tab-btn" data-tab="4" onclick="switchInfoTab(4,this)">정답 사진 갤러리</button>
+ </div>
+
+ <div id="infoTab-0" class="info-tab-content active">
+ <div class="info-sec-title">📌 과목별 기본 정보</div>
+ <table class="info-table">
+ <thead><tr><th>구분</th><th>과목명</th><th>시험시간</th><th>배점</th><th>시술부위</th><th>종목선택</th><th>비고</th></tr></thead>
+ <tbody>
+ <tr><td>제1과제</td><td>매니큐어</td><td>30분</td><td>20점</td><td>오른손 1~5지</td><td>4종목 중 1개</td><td>라운드 형태</td></tr>
+ <tr><td>제1과제</td><td>페디큐어</td><td>30분</td><td>20점</td><td>오른발 1~5지</td><td>3종목 중 1개</td><td>스퀘어, 분무기 습식케어</td></tr>
+ <tr><td>제2과제</td><td>젤매니큐어</td><td>35분</td><td>20점</td><td>왼손 1~5지</td><td>2종목 중 1개</td><td>라운드 완성</td></tr>
+ <tr><td>제3과제</td><td>인조네일</td><td>40분</td><td>30점</td><td>오른손 3,4지</td><td>4종목 중 1개</td><td>스퀘어, C-커브 20~40%</td></tr>
+ <tr><td>제4과제</td><td>인조네일제거</td><td>15분</td><td>10점</td><td>오른손 3지</td><td>제3과제와 동일</td><td>자연네일 라운드/오발</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title">📌 합격 / 불합격 기준</div>
+ <table class="info-table">
+ <thead><tr><th>구분</th><th>항목</th><th>기준</th><th>비고</th></tr></thead>
+ <tbody>
+ <tr><td>합격기준</td><td>총점</td><td>60점 이상</td><td>100점 만점</td></tr>
+ <tr><td>실격</td><td>무단이탈, 위생복 미착용, 모델 조건 부적합</td><td>즉시 실격</td><td>0점</td></tr>
+ <tr><td>실격</td><td>시간 초과</td><td>과제별 제한시간 초과</td><td>해당 과제 0점</td></tr>
+ <tr><td>오작</td><td>다른 과제 작업, 색상 오적용, 작업 부위 변경</td><td>해당 과제 0점</td><td></td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <div id="infoTab-1" class="info-tab-content">
+ <div class="info-sec-title" style="color:var(--blue);">📌 제1과제 매니큐어 (30분)</div>
+ <table class="info-table">
+ <thead><tr><th>종목</th><th>세부조건</th></tr></thead>
+ <tbody>
+ <tr><td>풀컬러 레드</td><td>풀컬러 시술</td></tr>
+ <tr><td>프렌치 화이트</td><td>스마일라인 0.3~0.5cm</td></tr>
+ <tr><td>딥프렌치 화이트</td><td>스마일라인 0.5~0.7cm</td></tr>
+ <tr><td>그라데이션 화이트</td><td>자연스러운 경계</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title" style="color:var(--blue);">📌 제1과제 페디큐어 (30분)</div>
+ <table class="info-table">
+ <thead><tr><th>종목</th><th>세부조건</th></tr></thead>
+ <tbody>
+ <tr><td>풀컬러 레드</td><td>풀컬러 시술</td></tr>
+ <tr><td>딥프렌치 화이트</td><td>스마일라인 0.5~0.7cm</td></tr>
+ <tr><td>그라데이션 화이트</td><td>자연스러운 경계</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title" style="color:var(--coral);">📌 제2과제 젤매니큐어 (35분)</div>
+ <table class="info-table">
+ <thead><tr><th>종목</th><th>세부조건</th></tr></thead>
+ <tbody>
+ <tr><td>선 마블링</td><td>선 패턴</td></tr>
+ <tr><td>부채꼴 마블링</td><td>부채꼴 패턴</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title" style="color:var(--purple);">📌 제3과제 인조네일 (40분)</div>
+ <table class="info-table">
+ <thead><tr><th>종목</th><th>세부조건</th></tr></thead>
+ <tbody>
+ <tr><td>내추럴 팁 위드 랩</td><td>팁+랩핑</td></tr>
+ <tr><td>젤 원톤 스컬프쳐</td><td>젤로 연장</td></tr>
+ <tr><td>아크릴 프렌치 스컬프쳐</td><td>아크릴+프렌치</td></tr>
+ <tr><td>네일 랩 익스텐션</td><td>네일 랩 연장</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title" style="color:var(--lime);">📌 제4과제 인조네일제거 (15분)</div>
+ <table class="info-table">
+ <thead><tr><th>종목</th><th>세부조건</th></tr></thead>
+ <tbody>
+ <tr><td>인조네일제거</td><td>오른손 3지 (제3과제 연장 부위) · 자연 손톱 라운드/오발 완성, 표면 매끄럽게 정리</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <div id="infoTab-2" class="info-tab-content">
+ <div class="info-sec-title" style="color:var(--blue);">📌 제1·2과목 감점 기준</div>
+ <table class="info-table">
+ <thead><tr><th>감점 요인</th><th>감점 범위</th></tr></thead>
+ <tbody>
+ <tr><td>큐티클 정리 미흡</td><td>1~2점</td></tr>
+ <tr><td>쉐입 불량</td><td>1~2점</td></tr>
+ <tr><td>컬러링 불량</td><td>2~3점</td></tr>
+ <tr><td>스마일라인 오차</td><td>2~3점</td></tr>
+ <tr><td>마무리 미흡</td><td>1점</td></tr>
+ <tr><td>젤 도포 불량</td><td>2~3점</td></tr>
+ <tr><td>마블링 불량</td><td>2~3점</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title" style="color:var(--purple);">📌 제3과목 인조네일 감점 기준</div>
+ <table class="info-table">
+ <thead><tr><th>감점 요인</th><th>감점 범위</th></tr></thead>
+ <tbody>
+ <tr><td>프리에지 길이 오차</td><td>3~5점</td></tr>
+ <tr><td>프리에지 두께 오차</td><td>3~5점</td></tr>
+ <tr><td>C-커브 오차</td><td>2~4점</td></tr>
+ <tr><td>좌우 대칭 불량</td><td>2~3점</td></tr>
+ <tr><td>표면 마감 불량</td><td>2~3점</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title" style="color:var(--lime);">📌 제4과목 인조네일제거 감점 기준</div>
+ <table class="info-table">
+ <thead><tr><th>감점 요인</th><th>감점 범위</th></tr></thead>
+ <tbody>
+ <tr><td>인조네일 잔여물</td><td>2~3점</td></tr>
+ <tr><td>자연네일 손상</td><td>2~3점</td></tr>
+ <tr><td>시간 초과</td><td>1~2점</td></tr>
+ <tr><td>마무리 미흡</td><td>1~2점</td></tr>
+ </tbody>
+ </table>
+ <div class="info-sec-title">🚨 실격 및 오작 처리</div>
+ <table class="info-table">
+ <thead><tr><th>구분</th><th>사유</th><th>처리</th></tr></thead>
+ <tbody>
+ <tr><td>실격</td><td>무단이탈, 위생복 미착용, 모델 조건 부적합</td><td>즉시 실격 (0점)</td></tr>
+ <tr><td>실격</td><td>과제별 제한시간 초과</td><td>해당 과제 0점</td></tr>
+ <tr><td>오작</td><td>다른 과제 작업, 색상 오적용, 작업 부위 변경</td><td>해당 과제 0점</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <div id="infoTab-3" class="info-tab-content">
+ <div class="info-sec-title">📌 자주 하는 실수 TOP10</div>
+ <table class="info-table">
+ <thead><tr><th>순위</th><th>실수 내용</th><th>해결 방법</th><th>해당 과목</th></tr></thead>
+ <tbody>
+ <tr><td>1</td><td>제품 소분 규칙 위반</td><td>소독제, 리무버, 젤 클렌저만 덜기</td><td>전과목</td></tr>
+ <tr><td>2</td><td>페디큐어 작업 자세 오류</td><td>수험자 무릎 위에 올리고 작업</td><td>제1과제</td></tr>
+ <tr><td>3</td><td>화이트 그라데이션 스펀지 뜯김</td><td>스펀지에 베이스+탑코트 실링</td><td>제1·2과제</td></tr>
+ <tr><td>4</td><td>선 마블링 미경화 닦기</td><td>미경화를 닦지 않고 작업</td><td>제2과제</td></tr>
+ <tr><td>5</td><td>아크릴 프렌치 대칭</td><td>컬러 팁 위에 연습</td><td>제3과제</td></tr>
+ <tr><td>6</td><td>케어 연습 비율</td><td>필오프:파우더 = 4:1, 3층 구조</td><td>전과목</td></tr>
+ <tr><td>7</td><td>소독 미흡</td><td>매 과제 시작 시 소독</td><td>전과목</td></tr>
+ <tr><td>8</td><td>프리에지 길이/두께 오차</td><td>캘리퍼스·자로 측정</td><td>제3과목</td></tr>
+ <tr><td>9</td><td>C-커브 비율 오차</td><td>원형 가이드 사용</td><td>제3과목</td></tr>
+ <tr><td>10</td><td>시간 초과</td><td>스톱워치로 측정</td><td>전과목</td></tr>
+ </tbody>
+ </table>
+ </div>
+
+ <div id="infoTab-4" class="info-tab-content"><div id="photoGalleryRoot"></div></div>
+ <div class="feedback-actions" style="margin-top:20px; justify-content:flex-end;"><button onclick="closeModal()">닫기</button></div>
+ </div></div>`;
+ renderPhotoGallery();
+}
+
+function switchInfoTab(tabIdx, btnEl){
+ document.querySelectorAll('.info-tab-content').forEach(c=>c.classList.remove('active'));
+ document.querySelectorAll('.info-tab-btn').forEach(b=>b.classList.remove('active'));
+ document.getElementById('infoTab-'+tabIdx).classList.add('active');
+ btnEl.classList.add('active');
+}
+
+/* ============ 14. 준비물 체크리스트 모달 ============ */
+function openPrepModal(){
+ const modalRoot = document.getElementById('modalRoot');
+ const prep = state.prepChecklist || {};
+ modalRoot.innerHTML = `
+ <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+ <div class="modal-box prep-modal">
+ <div class="modal-head"><h3>📦 시험 준비물 체크리스트</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+ <div class="modal-sub">시험장에 가기 전 모든 준비물이 갖춰졌는지 확인하세요.</div>
+ <div class="prep-grid">
+ <label><input type="checkbox" ${prep.nipper?'checked':''} onchange="updatePrep('nipper',this.checked)"> 니퍼</label>
+ <label><input type="checkbox" ${prep.file?'checked':''} onchange="updatePrep('file',this.checked)"> 파일/버퍼</label>
+ <label><input type="checkbox" ${prep.glue?'checked':''} onchange="updatePrep('glue',this.checked)"> 글루</label>
+ <label><input type="checkbox" ${prep.brush?'checked':''} onchange="updatePrep('brush',this.checked)"> 브러쉬</label>
+ <label><input type="checkbox" ${prep.lamp?'checked':''} onchange="updatePrep('lamp',this.checked)"> UV/LED 램프</label>
+ <label><input type="checkbox" ${prep.tip?'checked':''} onchange="updatePrep('tip',this.checked)"> 팁</label>
+ <label><input type="checkbox" ${prep.gel?'checked':''} onchange="updatePrep('gel',this.checked)"> 젤</label>
+ <label><input type="checkbox" ${prep.acrylic?'checked':''} onchange="updatePrep('acrylic',this.checked)"> 아크릴 파우더</label>
+ <label><input type="checkbox" ${prep.silk?'checked':''} onchange="updatePrep('silk',this.checked)"> 실크</label>
+ <label><input type="checkbox" ${prep.remover?'checked':''} onchange="updatePrep('remover',this.checked)"> 리무버</label>
+ <label><input type="checkbox" ${prep.sanitizer?'checked':''} onchange="updatePrep('sanitizer',this.checked)"> 손 소독제</label>
+ <label><input type="checkbox" ${prep.towel?'checked':''} onchange="updatePrep('towel',this.checked)"> 타올/페이퍼</label>
+ <label><input type="checkbox" ${prep.dustCollector?'checked':''} onchange="updatePrep('dustCollector',this.checked)"> 흡진기</label>
+ </div>
+ <div class="feedback-actions" style="margin-top:14px;"><button onclick="closeModal()">닫기</button></div>
+ </div></div>`;
+}
+function updatePrep(key, val){ state.prepChecklist[key] = val; saveState(); }
+
+function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+(async function init(){
+ state = defaultState();
+ const today = new Date(), todayStr = `${today.getMonth()+1}/${today.getDate()}`; 
+ const matchedDay = PLAN.find(d => d.date.startsWith(todayStr));
+ if(matchedDay) selectedDay = matchedDay.day;
+
+ renderApp();
+ setSaveStatus('ok');
+ await loadStateFromServer();
+ const loading = document.getElementById('loadingMsg');
+ if (loading) loading.style.display = 'none';
+ 
+ const examDate = new Date(2026, 7, 5); 
+ const diff = Math.ceil((examDate - today) / (1000*60*60*24));
+ if(diff <= 3 && diff >= 0) {
+ setTimeout(() => { if(confirm('📢 시험 3일 전입니다! 준비물 체크리스트를 확인하시겠어요?')) openPrepModal(); }, 800);
+ }
+ document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'start'});
+})();
+
+window.addEventListener('beforeunload', ()=>stopRunningTimer(true));
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeModal(); closeVisualTimer(); } });
+</script>
+</body>
+</html>
