@@ -618,19 +618,38 @@ function flashSaved(){
 
 /* ============ 6. 계산 함수 ============ */
 function dayPercent(day){
+ const d = PLAN[day-1];
  const st = ensureDay(day);
- let total=0, done=0;
- st.reps.forEach(arr=>{ total+=arr.length; done+=arr.filter(Boolean).length; });
- return total? Math.round(done/total*100) : 0;
+ const dayTotal = calculateDayTotal(d);
+ let totalTime = 0, doneTime = 0;
+ d.subjects.forEach((subj, idx)=>{
+ const subjTime = dayTotal.details[idx] ? dayTotal.details[idx].time : 0;
+ if(subj.count === 0 || subjTime === 0) return; // 시간 0인 항목(연장 없음 등)은 제외
+ const perRepTime = subjTime / subj.count;
+ totalTime += subjTime;
+ const doneCount = st.reps[idx].filter(Boolean).length;
+ doneTime += doneCount * perRepTime;
+ });
+ return totalTime ? Math.round(doneTime/totalTime*100) : 0;
 }
+ 
 function overallPercent(){
- let total=0, done=0;
+ let totalTime = 0, doneTime = 0;
  PLAN.forEach(d=>{
  const st = ensureDay(d.day);
- st.reps.forEach(arr=>{ total+=arr.length; done+=arr.filter(Boolean).length; });
+ const dayTotal = calculateDayTotal(d);
+ d.subjects.forEach((subj, idx)=>{
+ const subjTime = dayTotal.details[idx] ? dayTotal.details[idx].time : 0;
+ if(subj.count === 0 || subjTime === 0) return;
+ const perRepTime = subjTime / subj.count;
+ totalTime += subjTime;
+ const doneCount = st.reps[idx].filter(Boolean).length;
+ doneTime += doneCount * perRepTime;
  });
- return total? Math.round(done/total*100):0;
+ });
+ return totalTime ? Math.round(doneTime/totalTime*100):0;
 }
+ 
 function subjectOverall(idx){
  let total=0, done=0;
  PLAN.forEach(d=>{
