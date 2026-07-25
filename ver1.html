@@ -357,34 +357,56 @@ window.storage = {
 
 /* ============ 2. PLAN (13일 수정) ============ */
 const PLAN = [
- {day:1, date:'7/24(금)', note:'첫날, 균형 잡힌 스타트. 오전에 3과목 3회 처리.', mock:false, subjects:[
- {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'아크릴 x3', count:3},{name:'제거-아크릴 x3', count:3}]},
- {day:2, date:'7/25(토)', note:'종일 모델손. 실크 정밀 교정 집중.', mock:false, subjects:[
- {name:'딥프렌치 풀 x2', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크 x3', count:3},{name:'제거-실크 x3', count:3}]},
- {day:3, date:'7/26(일)', note:'종일 모델손. 18~19시 수업 제외. 프렌치 비중 상향.', mock:false, subjects:[
- {name:'그라데이션 풀 x2 + 프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴 x3', count:3},{name:'제거-아크릴 x3', count:3}]},
- {day:4, date:'7/27(월)', note:'모의고사(20~23시)는 실제 모델손. 낮 시간에 1·2과목+실크 처리.', mock:true, subjects:[
- {name:'프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'실크 x2', count:2},{name:'제거-실크 x2', count:2}]},
- {day:5, date:'7/28(화)', note:'모의고사 전까지 팁/젤 연장 대량 처리.', mock:true, subjects:[
- {name:'딥프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'팁위드랩2+젤1', count:1},{name:'제거 x3', count:3}]},
- {day:6, date:'7/29(수)', note:'14~17시 병원. 오전에 1·2과목+젤 2회 몰아서 끝내기.', mock:true, subjects:[
- {name:'그라데이션 풀 x1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'젤 x2', count:2},{name:'제거-젤 x2', count:2}]},
- {day:7, date:'7/30(목)', note:'20~21시 수업 제외. 3과목 혼합으로 감각 유지.', mock:false, subjects:[
- {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴2+실크1', count:1},{name:'제거 x3', count:3}]},
- {day:8, date:'7/31(금)', note:'', mock:true, subjects:[
- {name:'그라데이션 풀 x1', count:1},{name:'선+부채꼴 합본1 + 부채꼴단일0.5', count:1},{name:'아크릴 x2', count:2},{name:'제거-아크릴 x2', count:2}]},
- {day:9, date:'8/1(토)', note:'연습 9h + 모의고사 3h (20~23시) · 1과목 3세트로 균형 훈련', mock:true, subjects:[
- {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},  {name:'선+부채꼴 합본 x1', count:1},  {name:'아크릴 x2', count:2},  {name:'제거-아크릴 x2', count:2}]},
- {day:10, date:'8/2(일)', note:'종일 모델손. 실크 3회 + 아크릴 1회로 밸런스 회복.', mock:false, subjects:[
- {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크3 + 아크릴1', count:1},{name:'제거 x4', count:4}]},
- {day:11, date:'8/3(월)', note:'일반연습 9시간에 맞춤. 모의고사 전에 1·2과목 속도 단축 훈련.', mock:true, subjects:[
- {name:'프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴2+실크1', count:1},{name:'제거 x3', count:3}]},
- {day:12, date:'8/4(화)', note:'도구 최종 점검 & 모든 종목 1회씩 골고루 체크.', mock:true, subjects:[
- {name:'프렌치 풀 x1', count:1},{name:'선마블링 단일 x1', count:1},{name:'실크1+젤1+팁1+아크릴1', count:1},{name:'제거 x4', count:4}]},
- {day:13, date:'8/5(수)', note:'🚨 6~9시 가벼운 손풀기. 9~12시 최종 모의고사. 13시 시험 시작!', mock:true, subjects:[
- {name:'프렌치 축소 0.5', count:1},{name:'부채꼴 단일 0.5', count:1},{name:'연장 없음', count:0},{name:'제거 없음', count:0}]}
+  // 1일차 (7/24) - 이미 지난 날짜, 수정 불필요 (그대로 유지)
+  {day:1, date:'7/24(금)', note:'첫날, 균형 잡힌 스타트. 오전에 3과목 3회 처리.', mock:false, subjects:[
+    {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'아크릴 x3', count:3},{name:'제거-아크릴 x3', count:3}]},
+  // 2일차 (7/25)
+  {day:2, date:'7/25(토)', note:'종일 모델손. 실크 정밀 교정 집중.', mock:false, subjects:[
+    {name:'딥프렌치 풀 x2', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크 x3', count:3},{name:'제거-실크 x3', count:3}]},
+  // 3일차 (7/26)
+  {day:3, date:'7/26(일)', note:'종일 모델손. 18~19시 수업 제외. 프렌치 비중 상향.', mock:false, subjects:[
+    {name:'그라데이션 풀 x2 + 프렌치 풀 x1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴 x3', count:3},{name:'제거-아크릴 x3', count:3}]},
+  
+  // 4일차 (7/27) - 모의고사: 실제 시험 종목으로 변경
+  {day:4, date:'7/27(월)', note:'모의고사(20~23시)는 실제 시험처럼 진행', mock:true, subjects:[
+    {name:'레드풀컬러', count:1},{name:'선마블링', count:1},{name:'실크연장', count:1},{name:'제거', count:1}]},
+  
+  // 5일차 (7/28) - 모의고사
+  {day:5, date:'7/28(화)', note:'모의고사 전까지 팁/젤 연장 대량 처리.', mock:true, subjects:[
+    {name:'프렌치', count:1},{name:'부채꼴마블링', count:1},{name:'내추럴팁위드랩', count:1},{name:'제거', count:1}]},
+  
+  // 6일차 (7/29) - 모의고사
+  {day:6, date:'7/29(수)', note:'14~17시 병원. 오전에 1·2과목+젤 2회 몰아서 끝내기.', mock:true, subjects:[
+    {name:'딥프렌치', count:1},{name:'선마블링', count:1},{name:'젤원톤스컬프쳐', count:1},{name:'제거', count:1}]},
+  
+  // 7일차 (7/30) - 일반 연습
+  {day:7, date:'7/30(목)', note:'20~21시 수업 제외. 3과목 혼합으로 감각 유지.', mock:false, subjects:[
+    {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴2+실크1', count:1},{name:'제거 x3', count:3}]},
+  
+  // 8일차 (7/31) - 모의고사
+  {day:8, date:'7/31(금)', note:'', mock:true, subjects:[
+    {name:'화이트그라데이션', count:1},{name:'부채꼴마블링', count:1},{name:'아크릴프렌치스컬프쳐', count:1},{name:'제거', count:1}]},
+  
+  // 9일차 (8/1) - 모의고사 (연습 9h + 모의 3h)
+  {day:9, date:'8/1(토)', note:'연습 9h + 모의고사 3h (20~23시) · 실제 시험처럼 진행', mock:true, subjects:[
+    {name:'레드풀컬러', count:1},{name:'선마블링', count:1},{name:'실크연장', count:1},{name:'제거', count:1}]},
+  
+  // 10일차 (8/2) - 일반 연습
+  {day:10, date:'8/2(일)', note:'종일 모델손. 실크 3회 + 아크릴 1회로 밸런스 회복.', mock:false, subjects:[
+    {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크3 + 아크릴1', count:1},{name:'제거 x4', count:4}]},
+  
+  // 11일차 (8/3) - 모의고사
+  {day:11, date:'8/3(월)', note:'일반연습 9시간에 맞춤. 모의고사 전에 1·2과목 속도 단축 훈련.', mock:true, subjects:[
+    {name:'프렌치', count:1},{name:'선마블링', count:1},{name:'아크릴프렌치스컬프쳐', count:1},{name:'제거', count:1}]},
+  
+  // 12일차 (8/4) - 모의고사
+  {day:12, date:'8/4(화)', note:'도구 최종 점검 & 모든 종목 1회씩 골고루 체크.', mock:true, subjects:[
+    {name:'딥프렌치', count:1},{name:'부채꼴마블링', count:1},{name:'실크연장', count:1},{name:'제거', count:1}]},
+  
+  // 13일차 (8/5) - 모의고사 (당일 시험)
+  {day:13, date:'8/5(수)', note:'🚨 6~9시 가벼운 손풀기. 9~12시 최종 모의고사. 13시 시험 시작!', mock:true, subjects:[
+    {name:'화이트그라데이션', count:1},{name:'선마블링', count:1},{name:'젤원톤스컬프쳐', count:1},{name:'제거', count:1}]}
 ];
-
 /* ============ 3. MOCK_ROUNDS (7회) ============ */
 const MOCK_ROUNDS = [
   // 1회차: 7/27(월)
@@ -668,7 +690,16 @@ function subjectOverall(idx){
  });
  return total? Math.round(done/total*100):0;
 }
-function perRepMinutes(day, idx){ return WEEK_MIN[weekOf(day)][idx]; }
+function perRepMinutes(day, idx){
+  const d = PLAN[day-1];
+  if (d.mock) {
+    // 실제 시험 시간 (분)
+    const mockTimes = [30, 35, 40, 15];
+    return mockTimes[idx] || 0;
+  }
+  return WEEK_MIN[weekOf(day)][idx];
+}
+ 
 function perRepSeconds(day, idx){ return perRepMinutes(day, idx) * 60; }
 
 const BASE_TIME = {
@@ -678,62 +709,89 @@ const BASE_TIME = {
 };
 
 function calculateDayTotal(dayPlan) {
- const subjects = dayPlan.subjects;
- let total = 0;
- const details = [];
+  const subjects = dayPlan.subjects;
+  let total = 0;
+  const details = [];
+  const isMock = dayPlan.mock || false;
 
- if (subjects[0]) {
- const s = subjects[0];
- let time = 0;
- const name = s.name;
- if (name.includes('풀')) {
- const count = (name.match(/풀/g) || []).length;
- time = count * BASE_TIME.subject1_full;
- } else if (name.includes('축소') || name.includes('단일')) {
- const match = name.match(/[\d.]+/);
- const count = match ? parseFloat(match[0]) : 1;
- time = count * BASE_TIME.subject1_half;
- }
- if (s.count === 0) time = 0;
- total += time;
- details.push({ subject: '1과목', name: s.name, time: time });
- }
+  // 1과목
+  if (subjects[0]) {
+    const s = subjects[0];
+    let time = 0;
+    if (isMock) {
+      time = s.count * 0.5; // 실제 시험 30분
+    } else {
+      const name = s.name;
+      if (name.includes('풀')) {
+        const count = (name.match(/풀/g) || []).length;
+        time = count * BASE_TIME.subject1_full;
+      } else if (name.includes('축소') || name.includes('단일')) {
+        const match = name.match(/[\d.]+/);
+        const count = match ? parseFloat(match[0]) : 1;
+        time = count * BASE_TIME.subject1_half;
+      } else {
+        // 기본 풀세트 (프렌치, 딥프렌치 등)
+        time = s.count * BASE_TIME.subject1_full;
+      }
+    }
+    if (s.count === 0) time = 0;
+    total += time;
+    details.push({ subject: '1과목', name: s.name, time: time });
+  }
 
- if (subjects[1]) {
- const s = subjects[1];
- let time = 0;
- const name = s.name;
- if (name.includes('합본')) {
- const match = name.match(/[\d.]+/);
- const count = match ? parseFloat(match[0]) : 1;
- time = count * BASE_TIME.subject2_full;
- } else if (name.includes('단일')) {
- const match = name.match(/[\d.]+/);
- const count = match ? parseFloat(match[0]) : 1;
- time = count * BASE_TIME.subject2_half;
- }
- if (s.count === 0) time = 0;
- total += time;
- details.push({ subject: '2과목', name: s.name, time: time });
- }
+  // 2과목
+  if (subjects[1]) {
+    const s = subjects[1];
+    let time = 0;
+    if (isMock) {
+      time = s.count * (35/60); // 실제 시험 35분
+    } else {
+      const name = s.name;
+      if (name.includes('합본')) {
+        const match = name.match(/[\d.]+/);
+        const count = match ? parseFloat(match[0]) : 1;
+        time = count * BASE_TIME.subject2_full;
+      } else if (name.includes('단일')) {
+        const match = name.match(/[\d.]+/);
+        const count = match ? parseFloat(match[0]) : 1;
+        time = count * BASE_TIME.subject2_half;
+      } else {
+        // 기본 단일 (선마블링, 부채꼴마블링)
+        time = s.count * BASE_TIME.subject2_half;
+      }
+    }
+    if (s.count === 0) time = 0;
+    total += time;
+    details.push({ subject: '2과목', name: s.name, time: time });
+  }
 
- if (subjects[2]) {
- const s = subjects[2];
- let time = 0;
- if (s.name !== '연장 없음' && s.count > 0) time = s.count * BASE_TIME.subject3;
- total += time;
- details.push({ subject: '3과목', name: s.name, time: time });
- }
+  // 3과목
+  if (subjects[2]) {
+    const s = subjects[2];
+    let time = 0;
+    if (isMock) {
+      time = s.count * (40/60); // 실제 시험 40분
+    } else {
+      if (s.name !== '연장 없음' && s.count > 0) time = s.count * BASE_TIME.subject3;
+    }
+    total += time;
+    details.push({ subject: '3과목', name: s.name, time: time });
+  }
 
- if (subjects[3]) {
- const s = subjects[3];
- let time = 0;
- if (s.name !== '제거 없음' && s.count > 0) time = s.count * BASE_TIME.subject4;
- total += time;
- details.push({ subject: '4과목', name: s.name, time: time });
- }
+  // 4과목
+  if (subjects[3]) {
+    const s = subjects[3];
+    let time = 0;
+    if (isMock) {
+      time = s.count * (15/60); // 실제 시험 15분
+    } else {
+      if (s.name !== '제거 없음' && s.count > 0) time = s.count * BASE_TIME.subject4;
+    }
+    total += time;
+    details.push({ subject: '4과목', name: s.name, time: time });
+  }
 
- return { total: Math.round(total * 100) / 100, details: details };
+  return { total: Math.round(total * 100) / 100, details: details };
 }
 
 function estimatedDayMinutes(day){
@@ -1129,9 +1187,16 @@ function renderTaskGrid(day){
  <span class="subj-tag" style="background:${SUBJECT_COLOR[idx]}">${SUBJECT_LABEL[idx]}</span>
  <p class="content-name">${subj.name}</p>
  ${(() => {
+ ${(() => {
  const dayTotal = calculateDayTotal(d);
  const subjectTime = dayTotal.details[idx] ? dayTotal.details[idx].time : 0;
  if (subjectTime <= 0) return '';
+
+ if (d.mock) {
+   // 모의고사일 경우 실제 시험 시간임을 강조
+   return `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간 (실제 시험 시간)</div>
+           <div style="font-size:11px; color:var(--purple); margin-bottom:4px;">📌 실제 시험 과목</div>`;
+ }
 
  let typeTag = '';
  let descText = '';
@@ -1175,6 +1240,7 @@ function renderTaskGrid(day){
  return `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간${typeTag ? ` (${typeTag})` : ''}</div>
          ${descText ? `<div style="font-size:11px; color:var(--ink-soft); margin-bottom:4px;">✔ ${descText}</div>` : ''}`;
 })()}
+  
  <div class="target-line">목표 ${subj.count}회 · 회당 목표 ${perRepMin}분</div>
  <div class="reps">
  ${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${SUBJECT_COLOR[idx]};`:''}" onclick="toggleRep(${day},${idx},${ri})">${done? '✓' : ri+1}</button>`).join('')}
