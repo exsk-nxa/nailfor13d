@@ -373,8 +373,8 @@ const PLAN = [
  {name:'프렌치 풀1 + 딥프 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'아크릴2+실크1', count:1},{name:'제거 x3', count:3}]},
  {day:8, date:'7/31(금)', note:'', mock:true, subjects:[
  {name:'그라데이션 풀 x1', count:1},{name:'선+부채꼴 합본1 + 부채꼴단일0.5', count:1},{name:'아크릴 x2', count:2},{name:'제거-아크릴 x2', count:2}]},
- {day:9, date:'8/1(토)', note:'9시간 가용 시간에 맞춰 1과목 3세트로 균형 훈련', mock:false, subjects:[
- {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},{name:'선+부채꼴 합본 x1', count:1},{name:'아크릴 x2', count:2},{name:'제거-아크릴 x2', count:2}]},
+ {day:9, date:'8/1(토)', note:'연습 9h + 모의고사 3h (20~23시) · 1과목 3세트로 균형 훈련', mock:true, subjects:[
+ {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},  {name:'선+부채꼴 합본 x1', count:1},  {name:'아크릴 x2', count:2},  {name:'제거-아크릴 x2', count:2}]},
  {day:10, date:'8/2(일)', note:'종일 모델손. 실크 3회 + 아크릴 1회로 밸런스 회복.', mock:false, subjects:[
  {name:'프렌치 풀1 + 딥프 풀1 + 그라데이션 풀1', count:1},{name:'선+부채꼴 합본 x2', count:1},{name:'실크3 + 아크릴1', count:1},{name:'제거 x4', count:4}]},
  {day:11, date:'8/3(월)', note:'일반연습 9시간에 맞춤. 모의고사 전에 1·2과목 속도 단축 훈련.', mock:true, subjects:[
@@ -387,13 +387,22 @@ const PLAN = [
 
 /* ============ 3. MOCK_ROUNDS (7회) ============ */
 const MOCK_ROUNDS = [
- {round:'1회차', date:'7/27(월)', sub1:'레드풀컬러', sub2:'선마블링', sub3:'실크연장', sub4:'제거', code:'R-L-S'},
- {round:'2회차', date:'7/28(화)', sub1:'프렌치', sub2:'부채꼴마블링', sub3:'내추럴팁위드랩', sub4:'제거', code:'F-C-T'},
- {round:'3회차', date:'7/29(수)', sub1:'딥프렌치', sub2:'선마블링', sub3:'젤원톤스컬프쳐', sub4:'제거', code:'D-L-J'},
- {round:'4회차', date:'7/31(금)', sub1:'화이트그라데이션', sub2:'부채꼴마블링', sub3:'아크릴프렌치스컬프쳐', sub4:'제거', code:'G-C-A'},
- {round:'5회차', date:'8/3(월)', sub1:'프렌치', sub2:'선마블링', sub3:'아크릴프렌치스컬프쳐', sub4:'제거', code:'F-L-A'},
- {round:'6회차', date:'8/4(화)', sub1:'딥프렌치', sub2:'부채꼴마블링', sub3:'실크연장', sub4:'제거', code:'D-C-S'},
- {round:'7회차', date:'8/5(수)', sub1:'화이트그라데이션', sub2:'선마블링', sub3:'젤원톤스컬프쳐', sub4:'제거', code:'G-L-J'}
+  // 1회차: 7/27(월)
+  {round:'1회차', date:'7/27(월)', sub1:'레드풀컬러', sub2:'선마블링', sub3:'실크연장', sub4:'제거', code:'R-L-S'},
+  // 2회차: 7/28(화)
+  {round:'2회차', date:'7/28(화)', sub1:'프렌치', sub2:'부채꼴마블링', sub3:'내추럴팁위드랩', sub4:'제거', code:'F-C-T'},
+  // 3회차: 7/29(수)
+  {round:'3회차', date:'7/29(수)', sub1:'딥프렌치', sub2:'선마블링', sub3:'젤원톤스컬프쳐', sub4:'제거', code:'D-L-J'},
+  // 4회차: 7/31(금)
+  {round:'4회차', date:'7/31(금)', sub1:'화이트그라데이션', sub2:'부채꼴마블링', sub3:'아크릴프렌치스컬프쳐', sub4:'제거', code:'G-C-A'},
+  // 5회차: 8/1(토) ← 추가된 회차
+  {round:'5회차', date:'8/1(토)', sub1:'레드풀컬러', sub2:'선마블링', sub3:'실크연장', sub4:'제거', code:'R-L-S'},
+  // 6회차: 8/3(월)
+  {round:'6회차', date:'8/3(월)', sub1:'프렌치', sub2:'선마블링', sub3:'아크릴프렌치스컬프쳐', sub4:'제거', code:'F-L-A'},
+  // 7회차: 8/4(화)
+  {round:'7회차', date:'8/4(화)', sub1:'딥프렌치', sub2:'부채꼴마블링', sub3:'실크연장', sub4:'제거', code:'D-C-S'},
+  // 8회차: 8/5(수)
+  {round:'8회차', date:'8/5(수)', sub1:'화이트그라데이션', sub2:'선마블링', sub3:'젤원톤스컬프쳐', sub4:'제거', code:'G-L-J'}
 ];
 
 const SUBJECT_LABEL = ['1과목','2과목','3과목','4과목'];
