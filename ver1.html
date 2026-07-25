@@ -202,7 +202,6 @@
  .memo-item .memo-text{font-size:13px; color:var(--ink); line-height:1.5; white-space:pre-wrap;}
  .modal-empty{font-size:13px; color:var(--ink-soft); text-align:center; padding:30px 0;}
 
-
  .info-modal-box {max-width: 1120px; width: 100%; background: var(--surface); border-radius: 24px; padding: 28px 30px; max-height: 86vh; overflow-y: auto; box-shadow: 0 30px 70px -20px rgba(26, 32, 44, 0.4);}
  .info-tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--line); margin-bottom: 20px; padding-bottom: 2px; overflow-x: auto;}
  .info-tab-btn { background: none; border: none; padding: 9px 15px; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-radius: 8px 8px 0 0; white-space: nowrap; position: relative;}
@@ -419,7 +418,6 @@ window.storage = {
  }
 };
 
-/* ============ 2. PLAN (13일 수정) ============ */
 /* ============ 2. PLAN (13일 수정) ============ */
 const PLAN = [
   // 1일차 (7/24) 가용12h · 연습12h
@@ -780,8 +778,7 @@ const BASE_TIME = {
  subject3: 0.92, subject4: 0.42
 };
 
-// 이름 문자열에서 실제 반복 횟수를 모두 더해서 반환 (예: "그라데이션 풀 x2 + 프렌치 풀 x1" -> 3)
-// "x숫자" 표기를 우선으로 모두 합산하고, 없으면 "풀1/단일1/축소0.5" 처럼 키워드 뒤 숫자를 모두 합산한다.
+// 이름 문자열에서 실제 반복 횟수를 모두 더해서 반환
 function sumQuantities(name) {
   const xMatches = name.match(/x\s*([\d.]+)/gi);
   if (xMatches && xMatches.length) {
@@ -791,7 +788,7 @@ function sumQuantities(name) {
   if (kwMatches && kwMatches.length) {
     return kwMatches.reduce((sum, m) => sum + parseFloat(m.replace(/[^\d.]/g, '')), 0);
   }
-  return null; // 수량 표기를 찾지 못함
+  return null;
 }
 
 function calculateDayTotal(dayPlan) {
@@ -811,7 +808,6 @@ function calculateDayTotal(dayPlan) {
       const count = sumQuantities(name);
       time = (count !== null ? count : s.count) * BASE_TIME.subject1_half;
     } else {
-      // 기본 풀세트 (프렌치, 딥프렌치 등)
       time = s.count * BASE_TIME.subject1_full;
     }
     if (s.count === 0) time = 0;
@@ -831,7 +827,6 @@ function calculateDayTotal(dayPlan) {
       const count = sumQuantities(name);
       time = (count !== null ? count : s.count) * BASE_TIME.subject2_half;
     } else {
-      // 기본 단일 (선마블링, 부채꼴마블링)
       time = s.count * BASE_TIME.subject2_half;
     }
     if (s.count === 0) time = 0;
@@ -857,7 +852,7 @@ function calculateDayTotal(dayPlan) {
     details.push({ subject: '4과목', name: s.name, time: time });
   }
 
-  // 모의고사 (실전 전과목: 60+35+40+15 = 150분)
+  // 모의고사 (실전 전과목)
   if (dayPlan.mockSolo) {
     const mockTotalH = MOCK_EXAM_TIMES.reduce((a,b)=>a+b, 0) / 60;
     total += mockTotalH;
@@ -876,11 +871,6 @@ function formatMinutes(mins){
  if(h === 0) return `${m}분`;
  if(m === 0) return `${h}시간`;
  return `${h}시간 ${m}분`;
-}
-function getRemaining(day, idx){
- const st = ensureDay(day);
- const r = st.timerRemaining[idx];
- return (r===null || r===undefined) ? perRepSeconds(day, idx) : r;
 }
 function fmtTime(sec){
  sec = Math.max(0, Math.round(sec));
@@ -1121,7 +1111,6 @@ function selectDay(day){
  document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-/* ============ 8. RENDER 함수들 ============ */
 function renderDayPanel(day){
  const d = PLAN[day-1];
  const st = ensureDay(day);
@@ -1188,9 +1177,6 @@ function renderDayPanel(day){
  if(d.mockSolo) renderMockTaskGrid(day);
 }
 
-// (주의: 기존 renderTaskGrid 함수는 건드리지 않고 그대로 둡니다.)
-
-// 새롭게 추가되는 모의고사용 그리드 렌더링 함수
 function renderMockTaskGrid(day){
  const d = PLAN[day-1];
  const st = ensureDay(day);
@@ -1292,6 +1278,7 @@ function renderMockTaskGrid(day){
    </div>`;
  }).join('');
 }
+
 function renderTaskGrid(day){
  const d = PLAN[day-1];
  const st = ensureDay(day);
@@ -1302,8 +1289,8 @@ function renderTaskGrid(day){
  const reps = st.reps[idx];
  const donePct = reps.length? Math.round(reps.filter(Boolean).length/reps.length*100):0;
  const perRepMin = perRepMinutes(day, idx);
- const isRunning = runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.status === 'running';
- const isFinished = runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.status === 'finished';
+ const isRunning = runningTimer && runningTimer.day===day && runningTimer.idx===idx && !runningTimer.isMock && runningTimer.status === 'running';
+ const isFinished = runningTimer && runningTimer.day===day && runningTimer.idx===idx && !runningTimer.isMock && runningTimer.status === 'finished';
  let displayText = '', isOver = false, overSec = 0;
 
  if(isRunning){
@@ -1313,7 +1300,7 @@ function renderTaskGrid(day){
  const elapsed = (Date.now() - runningTimer.finishedAt) / 1000;
  overSec = elapsed; displayText = fmtOverTime(elapsed); isOver = true;
  } else {
- const remainStored = getRemaining(day, idx);
+ const remainStored = getRemaining(day, idx, false);
  displayText = remainStored <= 0 ? '시간 종료' : fmtTime(remainStored);
  }
 
@@ -1345,7 +1332,6 @@ function renderTaskGrid(day){
  if (subjectTime <= 0) return '';
 
  if (d.mock) {
-   // 모의고사일 경우 실제 시험 시간임을 강조
    return `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간 (실제 시험 시간)</div>
            <div style="font-size:11px; color:var(--purple); margin-bottom:4px;">📌 실제 시험 과목</div>`;
  }
@@ -1354,7 +1340,6 @@ function renderTaskGrid(day){
  let descText = '';
  const name = subj.name;
 
- // 1과목 (idx 0)
  if (idx === 0) {
    if (name.includes('풀')) {
      typeTag = '풀세트';
@@ -1363,9 +1348,7 @@ function renderTaskGrid(day){
      typeTag = '하프세트';
      descText = '축소 버전 또는 단일 컬러링';
    }
- }
- // 2과목 (idx 1)
- else if (idx === 1) {
+ } else if (idx === 1) {
    if (name.includes('합본')) {
      typeTag = '합본 (Full)';
      descText = '선마블링 + 부채꼴마블링 동시 시술';
@@ -1373,16 +1356,12 @@ function renderTaskGrid(day){
      typeTag = '단일 (Half)';
      descText = '선마블링 또는 부채꼴마블링 중 하나';
    }
- }
- // 3과목 (idx 2) - 연장
- else if (idx === 2) {
+ } else if (idx === 2) {
    if (name !== '연장 없음') {
      typeTag = '연장';
      descText = '아크릴/실크/젤/팁위드랩 중 1회';
    }
- }
- // 4과목 (idx 3) - 제거
- else if (idx === 3) {
+ } else if (idx === 3) {
    if (name !== '제거 없음') {
      typeTag = '제거';
      descText = '인조네일 제거 1회';
@@ -1395,19 +1374,19 @@ function renderTaskGrid(day){
 
  <div class="target-line">목표 ${subj.count}회 · 회당 목표 ${perRepMin}분</div>
  <div class="reps">
- ${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${SUBJECT_COLOR[idx]};`:''}" onclick="toggleRep(${day},${idx},${ri})">${done? '✓' : ri+1}</button>`).join('')}
+ ${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${SUBJECT_COLOR[idx]};`:''}" onclick="toggleRep(${day},${idx},${ri},false)">${done? '✓' : ri+1}</button>`).join('')}
  </div>
  <div class="task-mini-track"><div class="task-mini-fill" style="width:${donePct}%; background:${SUBJECT_COLOR[idx]}"></div></div>
  <div class="time-log-row">
  <label>실제 소요(분):</label>
- <input type="number" min="0" step="0.5" value="${timeLog}" placeholder="분" onchange="updateTimeLog(${day},${idx},this.value)">
+ <input type="number" min="0" step="0.5" value="${timeLog}" placeholder="분" onchange="updateTimeLog(${day},${idx},this.value,false)">
  ${compareText ? `<span class="compare ${compareClass}">${compareText}</span>` : ''}
  </div>
  <div class="timer-row">
  <div><div class="t-target">회당 ${perRepMin}분 타이머</div><div class="t-elapsed ${isOver?'over':''}" id="elapsed-${idx}">${displayText}</div></div>
  <div class="timer-btns">
- ${isRunning ? `<button onclick="openVisualTimer()">타이머 열기</button><button onclick="pauseTimer(${day},${idx})">일시정지</button>` : isFinished ? `<button onclick="openVisualTimer()">타이머 열기</button><button onclick="startTimer(${day},${idx})">다시 시작</button>` : `<button onclick="openVisualTimer(${day},${idx})">타이머 열기</button><button onclick="startTimer(${day},${idx})">${displayText === '시간 종료' ? '다시 시작':'시작'}</button>`}
- <button class="secondary" onclick="resetTimer(${day},${idx})">초기화</button>
+ ${isRunning ? `<button onclick="openVisualTimer(${day},${idx},false)">타이머 열기</button><button onclick="pauseTimer(${day},${idx},false)">일시정지</button>` : isFinished ? `<button onclick="openVisualTimer(${day},${idx},false)">타이머 열기</button><button onclick="startTimer(${day},${idx},false)">다시 시작</button>` : `<button onclick="openVisualTimer(${day},${idx},false)">타이머 열기</button><button onclick="startTimer(${day},${idx},false)">${displayText === '시간 종료' ? '다시 시작':'시작'}</button>`}
+ <button class="secondary" onclick="resetTimer(${day},${idx},false)">초기화</button>
  </div>
  </div>
 
@@ -1415,15 +1394,15 @@ function renderTaskGrid(day){
  <label style="font-size:11px; font-weight:700; color:var(--ink); display:block; margin-bottom:6px;">📸 작품 사진 (정면 / 측면 / 45도)</label>
  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
  <div>
- <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="정면 링크" value="${escapeHtml(photoArr[0])}" onchange="updateTaskPhoto(${day},${idx},0,this.value)">
+ <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="정면 링크" value="${escapeHtml(photoArr[0])}" onchange="updateTaskPhoto(${day},${idx},0,this.value,false)">
  ${previewUrl0 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl0}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">정면</div>`}
  </div>
  <div>
- <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="측면 링크" value="${escapeHtml(photoArr[1])}" onchange="updateTaskPhoto(${day},${idx},1,this.value)">
+ <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="측면 링크" value="${escapeHtml(photoArr[1])}" onchange="updateTaskPhoto(${day},${idx},1,this.value,false)">
  ${previewUrl1 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl1}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">측면</div>`}
  </div>
  <div>
- <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="45도 링크" value="${escapeHtml(photoArr[2])}" onchange="updateTaskPhoto(${day},${idx},2,this.value)">
+ <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="45도 링크" value="${escapeHtml(photoArr[2])}" onchange="updateTaskPhoto(${day},${idx},2,this.value,false)">
  ${previewUrl2 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl2}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">45도</div>`}
  </div>
  </div>
@@ -1432,9 +1411,9 @@ function renderTaskGrid(day){
  <div class="subfeedback">
  <label style="display:flex; justify-content:space-between; align-items:center;">
  <span>이 과제 메모</span>
- <button type="button" onclick="openMemoModal(${day},${idx})" style="border:none; background:none; color:var(--blue); font-size:11px; font-weight:700; cursor:pointer; padding:0;">🔍 크게 보기</button>
+ <button type="button" onclick="openMemoModal(${day},${idx},false)" style="border:none; background:none; color:var(--blue); font-size:11px; font-weight:700; cursor:pointer; padding:0;">🔍 크게 보기</button>
  </label>
- <textarea id="subfb-${day}-${idx}" placeholder="종목별 피드백..." oninput="updateSubFeedback(${day},${idx}, this.value)">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
+ <textarea id="subfb-${day}-${idx}" placeholder="종목별 피드백..." oninput="updateSubFeedback(${day},${idx}, this.value, false)">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
  </div>
  </div>`;
  }).join('');
@@ -1543,7 +1522,6 @@ function buildScoreTrendSVG(trendData){
  const passY = padding.top + chartH - (60 / maxY * chartH);
  const barWidth = Math.min(34, (chartW / n) * 0.5);
 
- // 배경 그리드라인 (0/25/50/75/100)
  const gridLines = [0,25,50,75,100].map(v => {
  const gy = padding.top + chartH - (v/maxY*chartH);
  return `<line x1="${padding.left}" y1="${gy.toFixed(1)}" x2="${width-padding.right}" y2="${gy.toFixed(1)}"
@@ -1669,59 +1647,6 @@ function playBeepAlert(){
  }catch(e){}
 }
 
-// ====== 모의고사 타이머 ======
-let mockTimerInterval = null;
-let mockRunning = false;
-let mockRemaining = [0, 0, 0, 0];
-let mockStartTimes = [0, 0, 0, 0];
-const MOCK_EXAM_TIMES = [60, 35, 40, 15]; // 제1과제(매니큐어+페디큐어) 60분 · 제2과제 35분 · 제3과제 40분 · 제4과제 15분
-
-function startMockTimer(day, idx) {
-  if (mockRunning) return;
-
-  const totalSec = MOCK_EXAM_TIMES[idx] * 60;
-  let remain = mockRemaining[idx] || totalSec;
-  if (remain <= 0) remain = totalSec;
-
-  mockRunning = true;
-  const startTime = Date.now();
-  mockStartTimes[idx] = startTime;
-
-  if (mockTimerInterval) clearInterval(mockTimerInterval);
-
-  mockTimerInterval = setInterval(() => {
-    const elapsed = (Date.now() - startTime) / 1000;
-    const left = Math.max(0, remain - elapsed);
-    const el = document.getElementById('mock-elapsed-'+idx);
-    if (el) {
-      const mins = Math.floor(left / 60);
-      const secs = Math.floor(left % 60);
-      el.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      if (left <= 0) {
-        clearInterval(mockTimerInterval);
-        mockRunning = false;
-        playBeepAlert();
-        el.textContent = '⏰ 시간 종료';
-        el.style.color = 'var(--coral)';
-      }
-    }
-  }, 200);
-}
-
-function resetMockTimer(idx) {
-  if (mockTimerInterval) {
-    clearInterval(mockTimerInterval);
-    mockTimerInterval = null;
-    mockRunning = false;
-  }
-  mockRemaining[idx] = 0;
-  const el = document.getElementById('mock-elapsed-'+idx);
-  if (el) {
-    el.textContent = '00:00';
-    el.style.color = 'var(--purple)';
-  }
-}
-/* ============ 10. 타이머 관련 함수 ============ */
 function startTimer(day, idx, isMock = false){
  stopRunningTimer(true);
  let remaining = getRemaining(day, idx, isMock);
@@ -1854,6 +1779,20 @@ function openVisualTimer(day, idx, isMock = false){
  if(stepsEl){ stepsEl.value = loadStepNotes(name); stepsEl.oninput = ()=> saveStepNotes(name, stepsEl.value); }
 }
 
+function updateVisualTimerUI(left, overSec){
+ const face = document.getElementById('vClockFace'), txt = document.getElementById('vTimeText');
+ if(!face || !txt || !runningTimer) return;
+ if(runningTimer.status === 'running'){
+ txt.textContent = fmtTime(left);
+ const pct = Math.max(0, Math.min(100, (left / runningTimer.totalTarget) * 100));
+ face.style.background = `conic-gradient(var(--blue) 0% ${pct}%, #e2e8f0 ${pct}% 100%)`;
+ } else {
+ txt.textContent = fmtOverTime(overSec || 0);
+ face.style.background = `conic-gradient(var(--coral) 0% 100%, #e2e8f0 100% 100%)`;
+ }
+}
+function closeVisualTimer(){ document.getElementById('visualTimerRoot').innerHTML = ''; }
+
 /* ============ 11. 기타 인터렉션 ============ */
 function toggleRep(day, idx, repIdx, isMock = false){
  const st = ensureDay(day); 
@@ -1954,73 +1893,10 @@ function exportAllFeedback(){
  a.href = URL.createObjectURL(blob); a.download = '네일실기_오답노트.txt'; document.body.appendChild(a); a.click(); a.remove();
 }
 
-function loadStepNotes(name){
- if(!state.stepNotes) state.stepNotes = {};
- if(!state.stepNotes[name]) { try { const old = localStorage.getItem('stepNotes::'+name); if(old) { state.stepNotes[name] = old; saveState(); } } catch(e) {} }
- return state.stepNotes[name] || '';
-}
-function saveStepNotes(name, val){
- if(!state.stepNotes) state.stepNotes = {};
- state.stepNotes[name] = val; saveState();
-}
-
-function updateVisualTimerUI(left, overSec){
- const face = document.getElementById('vClockFace'), txt = document.getElementById('vTimeText');
- if(!face || !txt || !runningTimer) return;
- if(runningTimer.status === 'running'){
- txt.textContent = fmtTime(left);
- const pct = Math.max(0, Math.min(100, (left / runningTimer.totalTarget) * 100));
- face.style.background = `conic-gradient(var(--blue) 0% ${pct}%, #e2e8f0 ${pct}% 100%)`;
- } else {
- txt.textContent = fmtOverTime(overSec || 0);
- face.style.background = `conic-gradient(var(--coral) 0% 100%, #e2e8f0 100% 100%)`;
- }
-}
-function closeVisualTimer(){ document.getElementById('visualTimerRoot').innerHTML = ''; }
-
-/* ============ 11. 기타 인터렉션 ============ */
-function toggleRep(day, idx, repIdx){
- const st = ensureDay(day); st.reps[idx][repIdx] = !st.reps[idx][repIdx]; saveState(); updateAllUI();
-}
-function updateSubFeedback(day, idx, val){ ensureDay(day).subFeedback[idx] = val; saveState(); }
-function updateTimeLog(day, idx, val){ ensureDay(day).timeLogs[idx] = val === '' ? null : parseFloat(val); saveState(); renderTaskGrid(day); }
-
-function updateTaskPhoto(day, idx, photoIdx, val){
- const st = ensureDay(day);
- if(!st.taskPhotos) st.taskPhotos = [['','',''],['','',''],['','',''],['','','']];
- if(!Array.isArray(st.taskPhotos[idx])) st.taskPhotos[idx] = [st.taskPhotos[idx]||'','',''];
- st.taskPhotos[idx][photoIdx] = val.trim();
- saveState();
- renderTaskGrid(day);
-}
-
 function updateMockAnalysis(day, field, val){
  const st = ensureDay(day);
  if(field === 'recovery') st.mockAnalysis.recovery = val; else st.mockAnalysis[field] = val;
  saveState();
-}
-
-function copyDayFeedback(day){
- const d = PLAN[day-1], st = ensureDay(day);
- let text = `[Day ${d.day} · ${d.date}] 오답노트\n전체 피드백: ${st.feedback||'(없음)'}\n`;
- d.subjects.forEach((s,i)=>{ text += `- ${SUBJECT_LABEL[i]} (${s.name}): ${st.subFeedback[i]||'(없음)'}\n`; });
- navigator.clipboard.writeText(text).then(()=>flashSaved()).catch(()=>alert('복사에 실패했어요.'));
-}
-
-function exportAllFeedback(){
- let text = `네일 실기 13일 완성 플랜 · 오답노트 모음\n생성일: ${new Date().toLocaleString()}\n\n`;
- PLAN.forEach(d=>{
- const st = ensureDay(d.day);
- const hasContent = st.feedback || st.subFeedback.some(f=>f);
- if(!hasContent) return;
- text += `[Day ${d.day} · ${d.date}]\n`;
- if(st.feedback) text += `전체: ${st.feedback}\n`;
- d.subjects.forEach((s,i)=>{ if(st.subFeedback[i]) text += `- ${SUBJECT_LABEL[i]}(${s.name}): ${st.subFeedback[i]}\n`; });
- text += `\n`;
- });
- if(text.trim().endsWith('모음')){ alert('아직 작성된 피드백이 없어요.'); return; }
- const blob = new Blob([text], {type:'text/plain;charset=utf-8'}), a = document.createElement('a');
- a.href = URL.createObjectURL(blob); a.download = '네일실기_오답노트.txt'; document.body.appendChild(a); a.click(); a.remove();
 }
 
 async function resetAll(){
@@ -2028,31 +1904,6 @@ async function resetAll(){
  state = defaultState();
  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state), false); }catch(e){}
  renderApp();
-}
-function openMemoModal(day, idx){
- const d = PLAN[day-1];
- const st = ensureDay(day);
- const modalRoot = document.getElementById('modalRoot');
- modalRoot.innerHTML = `
- <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
- <div class="modal-box" style="max-width:640px;">
- <div class="modal-head">
- <div><h3><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${SUBJECT_COLOR[idx]};margin-right:7px;"></span>${SUBJECT_LABEL[idx]} 메모</h3></div>
- <button class="modal-close" onclick="closeModal()">✕</button>
- </div>
- <div class="modal-sub">Day ${day} · ${d.date} · ${escapeHtml(d.subjects[idx].name)}</div>
- <textarea id="memoModalTextarea" style="width:100%; min-height:280px; border:1px solid var(--line); border-radius:14px; padding:14px 16px; font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.7; resize:vertical; box-sizing:border-box;" placeholder="종목별 피드백...">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
- <div class="feedback-actions">
- <button onclick="closeModal()">완료</button>
- </div>
- </div></div>`;
- const ta = document.getElementById('memoModalTextarea');
- ta.addEventListener('input', (e)=>{
- updateSubFeedback(day, idx, e.target.value);
- const small = document.getElementById('subfb-'+day+'-'+idx);
- if(small) small.value = e.target.value;
- });
- ta.focus();
 }
 
 function openSubjectFeedback(idx){
