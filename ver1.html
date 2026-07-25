@@ -602,6 +602,10 @@ let saveTimeout = null;
 let runningTimer = null;
 let tickInterval = null;
 
+/* ============ 전역 변수 추가 ============ */
+const MOCK_EXAM_TIMES = [60, 35, 40, 15]; // 모의고사 제한시간 (1~4과제)
+
+/* ============ 5. STATE 업데이트 ============ */
 function defaultDayState(dayIdx){
  const d = PLAN[dayIdx-1];
  return {
@@ -611,7 +615,13 @@ function defaultDayState(dayIdx){
  subFeedback: ['','','',''],
  timeLogs: [null,null,null,null],
  taskPhotos: [['','',''],['','',''],['','',''],['','','']],
- mockAnalysis: { setupTime: '', recovery: false, deductions: '', improvements: '' }
+ mockAnalysis: { setupTime: '', recovery: false, deductions: '', improvements: '' },
+ // --- 모의고사 전용 상태 추가 ---
+ mockReps: [[false],[false],[false],[false]],
+ mockTimerRemaining: [null,null,null,null],
+ mockTimeLogs: [null,null,null,null],
+ mockTaskPhotos: [['','',''],['','',''],['','',''],['','','']],
+ mockSubFeedback: ['','','','']
  };
 }
 function defaultState(){
@@ -625,7 +635,27 @@ function defaultState(){
 }
 function ensureDay(day){
  if(!state.days[day]) state.days[day] = defaultDayState(day);
- return state.days[day];
+ const st = state.days[day];
+ // 구버전 데이터 호환성을 위한 기본값 세팅
+ if(!st.mockReps) st.mockReps = [[false],[false],[false],[false]];
+ if(!st.mockTimerRemaining) st.mockTimerRemaining = [null,null,null,null];
+ if(!st.mockTimeLogs) st.mockTimeLogs = [null,null,null,null];
+ if(!st.mockTaskPhotos) st.mockTaskPhotos = [['','',''],['','',''],['','',''],['','','']];
+ if(!st.mockSubFeedback) st.mockSubFeedback = ['','','',''];
+ return st;
+}
+
+/* ============ 시간 계산 헬퍼 함수 ============ */
+function getTargetMinutes(day, idx, isMock = false){
+ return isMock ? MOCK_EXAM_TIMES[idx] : perRepMinutes(day, idx);
+}
+function getTargetSeconds(day, idx, isMock = false){
+ return getTargetMinutes(day, idx, isMock) * 60;
+}
+function getRemaining(day, idx, isMock = false){
+ const st = ensureDay(day);
+ const r = isMock ? st.mockTimerRemaining[idx] : st.timerRemaining[idx];
+ return (r===null || r===undefined) ? getTargetSeconds(day, idx, isMock) : r;
 }
 
 let saveRetryTimeout = null;
@@ -1091,6 +1121,7 @@ function selectDay(day){
  document.getElementById('dayPanel').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
+/* ============ 8. RENDER 함수들 ============ */
 function renderDayPanel(day){
  const d = PLAN[day-1];
  const st = ensureDay(day);
@@ -1116,26 +1147,14 @@ function renderDayPanel(day){
  <div class="task-grid" id="taskGrid"></div>
 
  ${d.mockSolo ? `
-<div class="mock-exam-section">
-  <h4>📝 모의고사 (실전 제한시간 기준, 전과목)</h4>
-  <div class="mock-exam-grid">
-    ${[0,1,2,3].map(idx => {
-      const mockName = idx === 0 ? d.mockSolo : d.subjects[idx].name;
-      const time = MOCK_EXAM_TIMES[idx];
-      return `<div class="mock-exam-card">
-        <span class="subj-tag" style="background:${SUBJECT_COLOR[idx]}">${SUBJECT_LABEL[idx]}</span>
-        <div class="exam-name">${mockName}</div>
-        <div class="exam-time">⏱ 시험 제한시간: ${time}분${idx===0 ? ' (매니큐어+페디큐어 포함)' : ''}</div>
-        <div class="exam-actions">
-          <button onclick="startMockTimer(${day},${idx})">타이머 시작</button>
-          <span class="timer-display" id="mock-elapsed-${idx}">00:00</span>
-          <button onclick="resetMockTimer(${idx})" style="background:var(--surface-soft); color:var(--ink); border:1px solid var(--line); padding:4px 10px; border-radius:20px; font-size:10px; cursor:pointer;">초기화</button>
-        </div>
-      </div>`;
-    }).join('')}
-  </div>
-</div>
-` : ''}
+ <div class="mock-exam-section" style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed var(--purple);">
+   <h4 style="margin: 0 0 16px; color: var(--purple); font-size: 18px; font-weight: 700; display:flex; align-items:center; gap:8px;">
+     <span>🚨 실전 모의고사</span> 
+     <span style="font-size:12px; font-weight:600; background:var(--purple-soft); padding:4px 10px; border-radius:20px;">전과목 제한시간 기준</span>
+   </h4>
+   <div class="task-grid" id="mockTaskGrid"></div>
+ </div>
+ ` : ''}
 
  ${d.mock ? `
  <div class="mock-analysis">
@@ -1166,8 +1185,113 @@ function renderDayPanel(day){
 
  document.getElementById('dayFeedback').addEventListener('input', (e)=>{ st.feedback = e.target.value; saveState(); });
  renderTaskGrid(day);
+ if(d.mockSolo) renderMockTaskGrid(day);
 }
 
+// (주의: 기존 renderTaskGrid 함수는 건드리지 않고 그대로 둡니다.)
+
+// 새롭게 추가되는 모의고사용 그리드 렌더링 함수
+function renderMockTaskGrid(day){
+ const d = PLAN[day-1];
+ const st = ensureDay(day);
+ const grid = document.getElementById('mockTaskGrid');
+ if(!grid) return;
+
+ grid.innerHTML = [0,1,2,3].map(idx => {
+   const mockName = idx === 0 ? d.mockSolo : d.subjects[idx].name;
+   const reps = st.mockReps[idx];
+   const donePct = reps.length ? Math.round(reps.filter(Boolean).length/reps.length*100) : 0;
+   const perRepMin = MOCK_EXAM_TIMES[idx];
+   const isMock = true;
+
+   const isRunning = runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.isMock && runningTimer.status === 'running';
+   const isFinished = runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.isMock && runningTimer.status === 'finished';
+   
+   let displayText = '', isOver = false, overSec = 0;
+   if(isRunning){
+     const left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+     displayText = fmtTime(left);
+   } else if(isFinished){
+     const elapsed = (Date.now() - runningTimer.finishedAt) / 1000;
+     overSec = elapsed; displayText = fmtOverTime(elapsed); isOver = true;
+   } else {
+     const remainStored = getRemaining(day, idx, true);
+     displayText = remainStored <= 0 ? '시간 종료' : fmtTime(remainStored);
+   }
+
+   const timeLog = st.mockTimeLogs[idx] || '';
+   let compareText = '', compareClass = '';
+   if(timeLog !== '' && timeLog !== null) {
+     const actual = parseFloat(timeLog);
+     if(!isNaN(actual)) {
+       const diff = actual - perRepMin;
+       if(diff > 0) { compareText = `+${diff.toFixed(1)}분 초과`; compareClass = 'bad'; }
+       else if(diff < 0) { compareText = `${diff.toFixed(1)}분 단축`; compareClass = 'good'; }
+       else { compareText = '정확히 일치'; compareClass = 'good'; }
+     }
+   }
+
+   let photoArr = st.mockTaskPhotos[idx];
+   if(!Array.isArray(photoArr)) photoArr = [photoArr || '', '', ''];
+   const previewUrl0 = getDriveImageUrl(photoArr[0]);
+   const previewUrl1 = getDriveImageUrl(photoArr[1]);
+   const previewUrl2 = getDriveImageUrl(photoArr[2]);
+
+   return `<div class="task-card" style="border: 2px solid var(--purple); background: #fdfafc;">
+     <span class="subj-tag" style="background:${SUBJECT_COLOR[idx]}">${SUBJECT_LABEL[idx]}</span>
+     <p class="content-name">${mockName}</p>
+     
+     <div class="est-time" style="font-size:12px; color:var(--purple); font-weight:600; margin-bottom:2px;">⏱ 실전 타이머: ${perRepMin}분</div>
+     <div style="font-size:11px; color:var(--ink-soft); margin-bottom:4px;">✔ 실제 시험 환경 훈련</div>
+
+     <div class="target-line">목표 1회 · 제한시간 ${perRepMin}분</div>
+     <div class="reps">
+       <button class="rep-btn ${reps[0]?'done':''}" style="${reps[0]?`background:var(--purple);`:''}" onclick="toggleRep(${day},${idx},0,true)">${reps[0]? '✓' : '1'}</button>
+     </div>
+     <div class="task-mini-track"><div class="task-mini-fill" style="width:${donePct}%; background:var(--purple)"></div></div>
+     
+     <div class="time-log-row">
+       <label>실제 소요(분):</label>
+       <input type="number" min="0" step="0.5" value="${timeLog}" placeholder="분" onchange="updateTimeLog(${day},${idx},this.value,true)">
+       ${compareText ? `<span class="compare ${compareClass}">${compareText}</span>` : ''}
+     </div>
+     
+     <div class="timer-row">
+       <div><div class="t-target">제한시간 ${perRepMin}분 타이머</div><div class="t-elapsed ${isOver?'over':''}" id="mock-elapsed-${idx}">${displayText}</div></div>
+       <div class="timer-btns">
+         ${isRunning ? `<button onclick="openVisualTimer(${day},${idx},true)">타이머 열기</button><button onclick="pauseTimer(${day},${idx},true)">일시정지</button>` : isFinished ? `<button onclick="openVisualTimer(${day},${idx},true)">타이머 열기</button><button onclick="startTimer(${day},${idx},true)">다시 시작</button>` : `<button onclick="openVisualTimer(${day},${idx},true)">타이머 열기</button><button onclick="startTimer(${day},${idx},true)">${displayText === '시간 종료' ? '다시 시작':'시작'}</button>`}
+         <button class="secondary" onclick="resetTimer(${day},${idx},true)">초기화</button>
+       </div>
+     </div>
+
+     <div class="task-photo" style="margin-top:8px; margin-bottom:12px; background:#fff; padding:10px 12px; border-radius:10px; border:1px solid var(--line);">
+       <label style="font-size:11px; font-weight:700; color:var(--purple); display:block; margin-bottom:6px;">📸 모의고사 사진 (정면/측면/45도)</label>
+       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+         <div>
+           <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="정면 링크" value="${escapeHtml(photoArr[0])}" onchange="updateTaskPhoto(${day},${idx},0,this.value,true)">
+           ${previewUrl0 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl0}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">정면</div>`}
+         </div>
+         <div>
+           <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="측면 링크" value="${escapeHtml(photoArr[1])}" onchange="updateTaskPhoto(${day},${idx},1,this.value,true)">
+           ${previewUrl1 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl1}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">측면</div>`}
+         </div>
+         <div>
+           <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="45도 링크" value="${escapeHtml(photoArr[2])}" onchange="updateTaskPhoto(${day},${idx},2,this.value,true)">
+           ${previewUrl2 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl2}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">45도</div>`}
+         </div>
+       </div>
+     </div>
+
+     <div class="subfeedback">
+       <label style="display:flex; justify-content:space-between; align-items:center;">
+         <span style="color:var(--purple); font-weight:600;">모의고사 메모</span>
+         <button type="button" onclick="openMemoModal(${day},${idx},true)" style="border:none; background:none; color:var(--purple); font-size:11px; font-weight:700; cursor:pointer; padding:0;">🔍 크게 보기</button>
+       </label>
+       <textarea id="mock-subfb-${day}-${idx}" placeholder="실수했던 점이나 피드백..." style="border-color:var(--purple-soft);" oninput="updateSubFeedback(${day},${idx}, this.value, true)">${escapeHtml(st.mockSubFeedback[idx]||'')}</textarea>
+     </div>
+   </div>`;
+ }).join('');
+}
 function renderTaskGrid(day){
  const d = PLAN[day-1];
  const st = ensureDay(day);
@@ -1597,86 +1721,118 @@ function resetMockTimer(idx) {
     el.style.color = 'var(--purple)';
   }
 }
-
-function startTimer(day, idx){
+/* ============ 10. 타이머 관련 함수 ============ */
+function startTimer(day, idx, isMock = false){
  stopRunningTimer(true);
- let remaining = getRemaining(day, idx);
- if(remaining<=0) remaining = perRepSeconds(day, idx);
- runningTimer = { day, idx, startedAt: Date.now(), duration: remaining, totalTarget: perRepSeconds(day, idx), name: PLAN[day-1].subjects[idx].name, status: 'running' };
- renderTaskGrid(day); openVisualTimer(); clearInterval(tickInterval);
+ let remaining = getRemaining(day, idx, isMock);
+ const targetSec = getTargetSeconds(day, idx, isMock);
+ if(remaining<=0) remaining = targetSec;
+ const d = PLAN[day-1];
+ const name = isMock ? (idx===0 ? d.mockSolo : d.subjects[idx].name) : d.subjects[idx].name;
+ 
+ runningTimer = { day, idx, isMock, startedAt: Date.now(), duration: remaining, totalTarget: targetSec, name: name, status: 'running' };
+ 
+ if (isMock) renderMockTaskGrid(day); else renderTaskGrid(day);
+ openVisualTimer();
+ clearInterval(tickInterval);
+ 
  tickInterval = setInterval(()=>{
- if(!runningTimer) return;
- if(runningTimer.status === 'finished'){
- const overSec = (Date.now() - runningTimer.finishedAt) / 1000;
- const el = document.getElementById('elapsed-'+idx);
- if(el) el.textContent = fmtOverTime(overSec);
- updateVisualTimerUI(0, overSec);
- return;
- }
- const left = runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000;
- const el = document.getElementById('elapsed-'+idx);
- if(left <= 0){
- runningTimer.status = 'finished'; runningTimer.finishedAt = Date.now();
- const st = ensureDay(day); st.timerRemaining[idx] = 0; saveState(); playBeepAlert(); openVisualTimer(); renderTaskGrid(day); return;
- }
- if(el){ el.textContent = fmtTime(left); el.classList.toggle('danger', left<=10); }
- updateVisualTimerUI(left);
+   if(!runningTimer) return;
+   const elId = (runningTimer.isMock ? 'mock-elapsed-' : 'elapsed-') + runningTimer.idx;
+   
+   if(runningTimer.status === 'finished'){
+     const overSec = (Date.now() - runningTimer.finishedAt) / 1000;
+     const el = document.getElementById(elId);
+     if(el) el.textContent = fmtOverTime(overSec);
+     updateVisualTimerUI(0, overSec);
+     return;
+   }
+   
+   const left = runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000;
+   const el = document.getElementById(elId);
+   if(left <= 0){
+     runningTimer.status = 'finished'; runningTimer.finishedAt = Date.now();
+     const st = ensureDay(day);
+     if (runningTimer.isMock) st.mockTimerRemaining[runningTimer.idx] = 0;
+     else st.timerRemaining[runningTimer.idx] = 0;
+     saveState(); playBeepAlert(); openVisualTimer(); 
+     if (runningTimer.isMock) renderMockTaskGrid(day); else renderTaskGrid(day);
+     return;
+   }
+   if(el){ el.textContent = fmtTime(left); el.classList.toggle('danger', left<=10); }
+   updateVisualTimerUI(left);
  }, 250);
 }
 
-function pauseTimer(day, idx){
- if(runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.status === 'running'){
- const st = ensureDay(day);
- st.timerRemaining[idx] = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
- runningTimer = null; clearInterval(tickInterval); saveState(); renderTaskGrid(day); closeVisualTimer();
+function pauseTimer(day, idx, isMock = false){
+ if(runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.isMock===isMock && runningTimer.status === 'running'){
+   const st = ensureDay(day);
+   const rem = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+   if (isMock) st.mockTimerRemaining[idx] = rem;
+   else st.timerRemaining[idx] = rem;
+   runningTimer = null; clearInterval(tickInterval); saveState(); 
+   if (isMock) renderMockTaskGrid(day); else renderTaskGrid(day);
+   closeVisualTimer();
  }
 }
 
 function stopRunningTimer(save){
  if(runningTimer){
- const {day, idx, status} = runningTimer;
+   const {day, idx, isMock, status} = runningTimer;
+   const st = ensureDay(day);
+   if(status === 'running') {
+     const rem = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+     if (isMock) st.mockTimerRemaining[idx] = rem;
+     else st.timerRemaining[idx] = rem;
+   } else {
+     if (isMock) st.mockTimerRemaining[idx] = null;
+     else st.timerRemaining[idx] = null;
+   }
+   runningTimer = null; clearInterval(tickInterval); 
+   if(save) saveState(); closeVisualTimer();
+ }
+}
+
+function resetTimer(day, idx, isMock = false){
+ if(runningTimer && runningTimer.day===day && runningTimer.idx===idx && runningTimer.isMock===isMock){
+   runningTimer = null; clearInterval(tickInterval); closeVisualTimer();
+ }
  const st = ensureDay(day);
- if(status === 'running') st.timerRemaining[idx] = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+ if (isMock) st.mockTimerRemaining[idx] = null;
  else st.timerRemaining[idx] = null;
- runningTimer = null; clearInterval(tickInterval); if(save) saveState(); closeVisualTimer();
- }
+ saveState();
+ if (isMock) renderMockTaskGrid(day); else renderTaskGrid(day);
 }
 
-function resetTimer(day, idx){
- if(runningTimer && runningTimer.day===day && runningTimer.idx===idx){
- runningTimer = null; clearInterval(tickInterval); closeVisualTimer();
- }
- ensureDay(day).timerRemaining[idx] = null; saveState(); renderTaskGrid(day);
-}
-
-function openVisualTimer(day, idx){
+function openVisualTimer(day, idx, isMock = false){
  const root = document.getElementById('visualTimerRoot');
  if(runningTimer){
- let left = 0, overSec = 0;
- if(runningTimer.status === 'running') left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
- else overSec = (Date.now() - (runningTimer.finishedAt || Date.now())) / 1000;
- root.innerHTML = `
- <div class="visual-timer-overlay" onclick="if(event.target===this) closeVisualTimer()">
- <div class="visual-timer-box">
- <h3>${escapeHtml(runningTimer.name)}</h3>
- <div class="vt-sub">${runningTimer.status === 'running' ? '회당 목표시간 기준 · 남은시간만큼 색이 채워집니다' : '⏰ 시간이 종료되었습니다'}</div>
- <div class="visual-timer-body">
- <div class="timer-steps"><div class="timer-steps-label">📝Steps</div><textarea id="vStepsText" placeholder="예) 1. 소독 & 준비..."></textarea></div>
- <div class="timer-clock-col"><div class="visual-clock" id="vClock"><div class="visual-clock-face" id="vClockFace"></div><div class="visual-clock-knob"></div></div><div class="visual-time-text ${runningTimer.status === 'finished' ? 'over' : ''}" id="vTimeText">${runningTimer.status === 'running' ? fmtTime(left) : fmtOverTime(overSec)}</div></div>
- </div>
- <div class="visual-timer-actions">
- ${runningTimer.status === 'running' ? `<button class="gold" onclick="pauseTimer(${runningTimer.day},${runningTimer.idx})">일시정지</button>` : ''}
- <button class="ghost" onclick="closeVisualTimer()">닫기</button>
- </div>
- </div></div>`;
- const stepsEl = document.getElementById('vStepsText');
- if(stepsEl){ stepsEl.value = loadStepNotes(runningTimer.name); stepsEl.oninput = ()=> saveStepNotes(runningTimer.name, stepsEl.value); }
- updateVisualTimerUI(left, overSec); return;
+   let left = 0, overSec = 0;
+   if(runningTimer.status === 'running') left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
+   else overSec = (Date.now() - (runningTimer.finishedAt || Date.now())) / 1000;
+   root.innerHTML = `
+   <div class="visual-timer-overlay" onclick="if(event.target===this) closeVisualTimer()">
+   <div class="visual-timer-box">
+   <h3>${escapeHtml(runningTimer.name)}</h3>
+   <div class="vt-sub">${runningTimer.status === 'running' ? '목표시간 기준 · 남은시간만큼 색이 채워집니다' : '⏰ 시간이 종료되었습니다'}</div>
+   <div class="visual-timer-body">
+   <div class="timer-steps"><div class="timer-steps-label">📝Steps</div><textarea id="vStepsText" placeholder="예) 1. 소독 & 준비..."></textarea></div>
+   <div class="timer-clock-col"><div class="visual-clock" id="vClock"><div class="visual-clock-face" id="vClockFace"></div><div class="visual-clock-knob"></div></div><div class="visual-time-text ${runningTimer.status === 'finished' ? 'over' : ''}" id="vTimeText">${runningTimer.status === 'running' ? fmtTime(left) : fmtOverTime(overSec)}</div></div>
+   </div>
+   <div class="visual-timer-actions">
+   ${runningTimer.status === 'running' ? `<button class="gold" onclick="pauseTimer(${runningTimer.day},${runningTimer.idx},${runningTimer.isMock})">일시정지</button>` : ''}
+   <button class="ghost" onclick="closeVisualTimer()">닫기</button>
+   </div>
+   </div></div>`;
+   const stepsEl = document.getElementById('vStepsText');
+   if(stepsEl){ stepsEl.value = loadStepNotes(runningTimer.name); stepsEl.oninput = ()=> saveStepNotes(runningTimer.name, stepsEl.value); }
+   updateVisualTimerUI(left, overSec); return;
  }
 
  if(typeof day === 'undefined' || typeof idx === 'undefined') return;
- const name = PLAN[day-1].subjects[idx].name;
- const remain = getRemaining(day, idx), target = perRepSeconds(day, idx);
+ const d = PLAN[day-1];
+ const name = isMock ? (idx===0 ? d.mockSolo : d.subjects[idx].name) : d.subjects[idx].name;
+ const remain = getRemaining(day, idx, isMock), target = getTargetSeconds(day, idx, isMock);
  const pct = target>0 ? Math.max(0, Math.min(100, (remain/target)*100)) : 0;
  const isPaused = remain > 0 && remain < target;
 
@@ -1690,12 +1846,112 @@ function openVisualTimer(day, idx){
  <div class="timer-clock-col"><div class="visual-clock" id="vClock"><div class="visual-clock-face" id="vClockFace" style="background:conic-gradient(var(--blue) 0% ${pct}%, #e2e8f0 ${pct}% 100%)"></div><div class="visual-clock-knob"></div></div><div class="visual-time-text" id="vTimeText">${remain<=0 ? '시간 종료' : fmtTime(remain)}</div></div>
  </div>
  <div class="visual-timer-actions">
- <button class="gold" onclick="startTimer(${day},${idx})">${isPaused ? '이어서 시작' : '시작'}</button>
+ <button class="gold" onclick="startTimer(${day},${idx},${isMock})">${isPaused ? '이어서 시작' : '시작'}</button>
  <button class="ghost" onclick="closeVisualTimer()">닫기</button>
  </div>
  </div></div>`;
  const stepsEl = document.getElementById('vStepsText');
  if(stepsEl){ stepsEl.value = loadStepNotes(name); stepsEl.oninput = ()=> saveStepNotes(name, stepsEl.value); }
+}
+
+/* ============ 11. 기타 인터렉션 ============ */
+function toggleRep(day, idx, repIdx, isMock = false){
+ const st = ensureDay(day); 
+ if (isMock) st.mockReps[idx][repIdx] = !st.mockReps[idx][repIdx];
+ else st.reps[idx][repIdx] = !st.reps[idx][repIdx];
+ saveState(); updateAllUI();
+}
+
+function updateSubFeedback(day, idx, val, isMock = false){ 
+ const st = ensureDay(day);
+ if (isMock) st.mockSubFeedback[idx] = val;
+ else st.subFeedback[idx] = val;
+ saveState(); 
+}
+
+function updateTimeLog(day, idx, val, isMock = false){ 
+ const st = ensureDay(day);
+ const numVal = val === '' ? null : parseFloat(val);
+ if (isMock) st.mockTimeLogs[idx] = numVal;
+ else st.timeLogs[idx] = numVal;
+ saveState(); 
+ if (isMock) renderMockTaskGrid(day); else renderTaskGrid(day); 
+}
+
+function updateTaskPhoto(day, idx, photoIdx, val, isMock = false){
+ const st = ensureDay(day);
+ const photosArr = isMock ? st.mockTaskPhotos : st.taskPhotos;
+ if(!Array.isArray(photosArr[idx])) photosArr[idx] = [photosArr[idx]||'','',''];
+ photosArr[idx][photoIdx] = val.trim();
+ saveState();
+ if (isMock) renderMockTaskGrid(day); else renderTaskGrid(day);
+}
+
+function openMemoModal(day, idx, isMock = false){
+ const d = PLAN[day-1];
+ const st = ensureDay(day);
+ const note = isMock ? st.mockSubFeedback[idx] : st.subFeedback[idx];
+ const name = isMock ? (idx===0 ? d.mockSolo : d.subjects[idx].name) : d.subjects[idx].name;
+ const prefix = isMock ? '모의고사 ' : '';
+ 
+ const modalRoot = document.getElementById('modalRoot');
+ modalRoot.innerHTML = `
+ <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+ <div class="modal-box" style="max-width:640px;">
+ <div class="modal-head">
+ <div><h3><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${SUBJECT_COLOR[idx]};margin-right:7px;"></span>${prefix}${SUBJECT_LABEL[idx]} 메모</h3></div>
+ <button class="modal-close" onclick="closeModal()">✕</button>
+ </div>
+ <div class="modal-sub">Day ${day} · ${d.date} · ${escapeHtml(name)}</div>
+ <textarea id="memoModalTextarea" style="width:100%; min-height:280px; border:1px solid var(--line); border-radius:14px; padding:14px 16px; font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.7; resize:vertical; box-sizing:border-box;" placeholder="피드백...">${escapeHtml(note||'')}</textarea>
+ <div class="feedback-actions">
+ <button onclick="closeModal()">완료</button>
+ </div>
+ </div></div>`;
+ const ta = document.getElementById('memoModalTextarea');
+ ta.addEventListener('input', (e)=>{
+   updateSubFeedback(day, idx, e.target.value, isMock);
+   const smallId = isMock ? `mock-subfb-${day}-${idx}` : `subfb-${day}-${idx}`;
+   const small = document.getElementById(smallId);
+   if(small) small.value = e.target.value;
+ });
+ ta.focus();
+}
+
+function copyDayFeedback(day){
+ const d = PLAN[day-1], st = ensureDay(day);
+ let text = `[Day ${d.day} · ${d.date}] 오답노트\n전체 피드백: ${st.feedback||'(없음)'}\n\n[연습 피드백]\n`;
+ d.subjects.forEach((s,i)=>{ text += `- ${SUBJECT_LABEL[i]} (${s.name}): ${st.subFeedback[i]||'(없음)'}\n`; });
+ if(d.mockSolo) {
+   text += `\n[모의고사 피드백]\n`;
+   [0,1,2,3].forEach(i => {
+     const mName = i === 0 ? d.mockSolo : d.subjects[i].name;
+     if(st.mockSubFeedback[i]) text += `- ${SUBJECT_LABEL[i]} (${mName}): ${st.mockSubFeedback[i]}\n`;
+   });
+ }
+ navigator.clipboard.writeText(text).then(()=>flashSaved()).catch(()=>alert('복사에 실패했어요.'));
+}
+
+function exportAllFeedback(){
+ let text = `네일 실기 13일 완성 플랜 · 오답노트 모음\n생성일: ${new Date().toLocaleString()}\n\n`;
+ PLAN.forEach(d=>{
+   const st = ensureDay(d.day);
+   const hasContent = st.feedback || st.subFeedback.some(f=>f) || st.mockSubFeedback.some(f=>f);
+   if(!hasContent) return;
+   text += `[Day ${d.day} · ${d.date}]\n`;
+   if(st.feedback) text += `전체: ${st.feedback}\n`;
+   d.subjects.forEach((s,i)=>{ if(st.subFeedback[i]) text += `- [연습] ${SUBJECT_LABEL[i]}(${s.name}): ${st.subFeedback[i]}\n`; });
+   if(d.mockSolo) {
+     [0,1,2,3].forEach(i => {
+       const mName = i === 0 ? d.mockSolo : d.subjects[i].name;
+       if(st.mockSubFeedback[i]) text += `- [모의] ${SUBJECT_LABEL[i]}(${mName}): ${st.mockSubFeedback[i]}\n`;
+     });
+   }
+   text += `\n`;
+ });
+ if(text.trim().endsWith('모음')){ alert('아직 작성된 피드백이 없어요.'); return; }
+ const blob = new Blob([text], {type:'text/plain;charset=utf-8'}), a = document.createElement('a');
+ a.href = URL.createObjectURL(blob); a.download = '네일실기_오답노트.txt'; document.body.appendChild(a); a.click(); a.remove();
 }
 
 function loadStepNotes(name){
