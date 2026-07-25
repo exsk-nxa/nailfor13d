@@ -590,6 +590,13 @@ const SUBJECT_NAMES = {
  'acrylic': '아크릴', 'silk': '실크', 'tipwrap': '팁위드랩',
  'gel': '젤', 'removal': '제거'
 };
+/* 종목별 제한시간(분) - 실기 시험 규정 기준 */
+const SUBJECT_TIME_LIMIT = {
+ 'redfull': 60, 'french': 60, 'deepfrench': 60, 'gradation': 60,
+ 'linemarble': 35, 'fanmarble': 35,
+ 'acrylic': 40, 'silk': 40, 'tipwrap': 40, 'gel': 40,
+ 'removal': 15
+};
 
 /* ============ 5. STATE ============ */
 const STORAGE_KEY = 'nail_plan_state_v3_eval';
@@ -1005,6 +1012,7 @@ function renderApp(){
  <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">최근 3회 평균</span> <span id="recentAvg" style="font-size:16px; font-weight:700;">-</span></div>
  <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">합격 여부</span> <span id="passStatus" style="font-size:16px; font-weight:700;">-</span></div>
  <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">평가 횟수</span> <span id="practiceCount" style="font-size:16px; font-weight:700;">-</span></div>
+ <div><span style="font-weight:700; font-size:12px; color:var(--ink-soft); display:block;">시간 내 완수율</span> <span id="timeCompletionRate" style="font-size:16px; font-weight:700;">-</span></div>
  </div>
  </section>
 
@@ -1450,6 +1458,7 @@ function startEvaluation() {
  const subjKey = document.getElementById('subjectSelector').value;
  if(!subjKey) { alert('종목을 먼저 선택해주세요.'); return; }
  const criteria = EVAL_CRITERIA[subjKey];
+ const timeLimit = SUBJECT_TIME_LIMIT[subjKey] || null;
 
  let html = `<div style="background:#fff; padding:20px; border-radius:16px; border:1px solid var(--line);">
  <h4 style="margin:0 0 8px; font-size:15px; color:var(--ink);">✔️ ${SUBJECT_NAMES[subjKey]} 체크리스트</h4>
@@ -1461,7 +1470,23 @@ function startEvaluation() {
  <span style="line-height:1.4;">${c}</span>
  </label>`;
  });
- html += `<div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+
+ html += `<div style="margin-top:6px; margin-bottom:16px; background:var(--purple-soft); border-radius:12px; padding:14px 16px;">
+ <div style="font-size:13px; font-weight:700; color:var(--purple); margin-bottom:10px;">⏱ 시간 내 완수 여부${timeLimit ? ` <span style="font-weight:600; font-size:11.5px; color:var(--ink-soft);">(제한시간 ${timeLimit}분 기준)</span>` : ''}</div>
+ <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:10px;">
+ <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;">
+ <input type="radio" name="timeStatus" value="completed" style="accent-color:var(--lime);"> ✅ 시간 내 완성
+ </label>
+ <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;">
+ <input type="radio" name="timeStatus" value="incomplete" style="accent-color:var(--coral);"> ⛔ 미완성(시간 초과)
+ </label>
+ </div>
+ <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-soft);">
+ 실제 소요시간(분): <input type="number" id="evalTimeSpent" min="0" step="0.5" placeholder="선택 입력" style="width:80px; padding:4px 8px; border:1px solid var(--line); border-radius:6px; font-size:12px;">
+ </label>
+ </div>
+
+ <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
  <button class="reset-btn" onclick="document.getElementById('checklistContainer').style.display='none'">취소</button>
  <button class="reset-btn" onclick="saveEvaluation('${subjKey}')" style="background:var(--blue); color:#fff; font-weight:700; border:none; padding:8px 24px; border-radius:10px;">결과 저장</button>
  </div></div>`;
@@ -1477,6 +1502,12 @@ function saveEvaluation(subjKey) {
  let weaknesses = [];
  const pointPerItem = 100 / criteria.length;
 
+ const timeStatusEl = document.querySelector('input[name="timeStatus"]:checked');
+ if(!timeStatusEl) { alert('시간 내 완수 여부를 선택해주세요.'); return; }
+ const timeCompleted = timeStatusEl.value === 'completed';
+ const timeSpentRaw = document.getElementById('evalTimeSpent').value;
+ const timeSpent = timeSpentRaw !== '' ? parseFloat(timeSpentRaw) : null;
+
  criteria.forEach((c, idx) => {
  if(document.getElementById(`chkEval_${idx}`).checked) { score += pointPerItem; }
  else {
@@ -1491,12 +1522,15 @@ function saveEvaluation(subjKey) {
  date: new Date().toLocaleDateString(),
  timestamp: Date.now(),
  score: Math.round(score),
- weaknesses: weaknesses
+ weaknesses: weaknesses,
+ timeCompleted: timeCompleted,
+ timeLimit: SUBJECT_TIME_LIMIT[subjKey] || null,
+ timeSpent: timeSpent
  });
 
  saveState();
  updateStatsDashboard();
- alert(`평가가 완료되었습니다. (점수: ${Math.round(score)}점)`);
+ alert(`평가가 완료되었습니다. (점수: ${Math.round(score)}점 · ${timeCompleted ? '시간 내 완성' : '미완성(시간 초과)'})`);
  document.getElementById('checklistContainer').style.display = 'none';
 }
 
@@ -1562,6 +1596,7 @@ function updateStatsDashboard() {
  if(!state.evaluations) return;
  let totalScore = 0, evalCount = 0, todayCnt = 0;
  let allScores = [], allWeaknesses = {};
+ let timeCompletedCnt = 0, timeTrackedCnt = 0;
  let subjAvgHTML = '';
  const todayStr = new Date().toLocaleDateString();
  const subjects = Object.keys(state.evaluations);
@@ -1570,20 +1605,28 @@ function updateStatsDashboard() {
  const evals = state.evaluations[subjKey];
  if(!evals || evals.length === 0) return;
  let subjTotal = 0;
+ let subjTimeCompleted = 0, subjTimeTracked = 0;
  evals.forEach(e => {
  subjTotal += e.score; totalScore += e.score; evalCount++;
  allScores.push({ subj: SUBJECT_NAMES[subjKey], ...e });
  if(e.date === todayStr) todayCnt++;
  e.weaknesses.forEach(w => { allWeaknesses[w] = (allWeaknesses[w] || 0) + 1; });
+ if(typeof e.timeCompleted === 'boolean') {
+ timeTrackedCnt++; subjTimeTracked++;
+ if(e.timeCompleted) { timeCompletedCnt++; subjTimeCompleted++; }
+ }
  });
  const subjAvg = Math.round(subjTotal / evals.length);
+ const timeBadge = subjTimeTracked > 0
+ ? ` <span style="font-size:10.5px; font-weight:700; color:${subjTimeCompleted===subjTimeTracked ? 'var(--lime)' : 'var(--coral)'};">⏱ ${subjTimeCompleted}/${subjTimeTracked}</span>`
+ : '';
  subjAvgHTML += `
  <div style="display:flex; align-items:center; margin-bottom:10px; font-size:12.5px;">
  <span style="width:75px; font-weight:600;">${SUBJECT_NAMES[subjKey]}</span>
  <div style="flex:1; background:var(--surface-soft); height:14px; border-radius:10px; overflow:hidden; margin:0 12px; position:relative;">
  <div style="width:${subjAvg}%; height:100%; background:var(--blue); border-radius:10px;"></div>
  </div>
- <span style="width:36px; text-align:right; font-weight:700;">${subjAvg}점</span>
+ <span style="width:36px; text-align:right; font-weight:700;">${subjAvg}점</span>${timeBadge}
  </div>`;
  });
 
@@ -1593,6 +1636,7 @@ function updateStatsDashboard() {
  document.getElementById('subjectAvgChart').innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">아직 평가 데이터가 없습니다.</div>';
  document.getElementById('scoreTrendChart').innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">데이터가 없습니다.</div>';
  document.getElementById('weaknessList').innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">데이터가 없습니다.</div>';
+ document.getElementById('timeCompletionRate').innerText = '-';
  return;
  }
 
@@ -1602,6 +1646,14 @@ function updateStatsDashboard() {
  document.getElementById('avgScore').innerText = avg + '점';
  document.getElementById('practiceCount').innerText = evalCount + '회';
  document.getElementById('passStatus').innerText = avg >= 60 ? '🟢 합격권' : '🔴 노력 필요';
+
+ if(timeTrackedCnt > 0) {
+ const timeRate = Math.round((timeCompletedCnt / timeTrackedCnt) * 100);
+ document.getElementById('timeCompletionRate').innerText = `${timeRate}% (${timeCompletedCnt}/${timeTrackedCnt})`;
+ document.getElementById('timeCompletionRate').style.color = timeRate >= 80 ? 'var(--lime)' : (timeRate >= 50 ? 'var(--ink)' : 'var(--coral)');
+ } else {
+ document.getElementById('timeCompletionRate').innerText = '-';
+ }
 
  allScores.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
