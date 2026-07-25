@@ -1131,8 +1131,50 @@ function renderTaskGrid(day){
  ${(() => {
  const dayTotal = calculateDayTotal(d);
  const subjectTime = dayTotal.details[idx] ? dayTotal.details[idx].time : 0;
- return subjectTime > 0 ? `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간</div>` : '';
- })()}
+ if (subjectTime <= 0) return '';
+
+ let typeTag = '';
+ let descText = '';
+ const name = subj.name;
+
+ // 1과목 (idx 0)
+ if (idx === 0) {
+   if (name.includes('풀')) {
+     typeTag = '풀세트';
+     descText = '케어 + 컬러링 2세트 (베이스·컬러·탑)';
+   } else if (name.includes('축소') || name.includes('단일')) {
+     typeTag = '하프세트';
+     descText = '축소 버전 또는 단일 컬러링';
+   }
+ }
+ // 2과목 (idx 1)
+ else if (idx === 1) {
+   if (name.includes('합본')) {
+     typeTag = '합본 (Full)';
+     descText = '선마블링 + 부채꼴마블링 동시 시술';
+   } else if (name.includes('단일')) {
+     typeTag = '단일 (Half)';
+     descText = '선마블링 또는 부채꼴마블링 중 하나';
+   }
+ }
+ // 3과목 (idx 2) - 연장
+ else if (idx === 2) {
+   if (name !== '연장 없음') {
+     typeTag = '연장';
+     descText = '아크릴/실크/젤/팁위드랩 중 1회';
+   }
+ }
+ // 4과목 (idx 3) - 제거
+ else if (idx === 3) {
+   if (name !== '제거 없음') {
+     typeTag = '제거';
+     descText = '인조네일 제거 1회';
+   }
+ }
+
+ return `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간${typeTag ? ` (${typeTag})` : ''}</div>
+         ${descText ? `<div style="font-size:11px; color:var(--ink-soft); margin-bottom:4px;">✔ ${descText}</div>` : ''}`;
+})()}
  <div class="target-line">목표 ${subj.count}회 · 회당 목표 ${perRepMin}분</div>
  <div class="reps">
  ${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${SUBJECT_COLOR[idx]};`:''}" onclick="toggleRep(${day},${idx},${ri})">${done? '✓' : ri+1}</button>`).join('')}
