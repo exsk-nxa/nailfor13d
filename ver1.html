@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=dev<ice-width, initial-scale=1.0">
 <title>네일 실기 13일 완성 플래너 (종합 평가 모듈 포함)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -311,7 +311,81 @@
  .photo-card { flex: 0 0 140px; }
  .common-guide .photo-card { flex: 0 0 120px; }
  .photo-grid { gap: 12px; }
- }
+ 
+
+/* ===== 모의고사 전용 영역 ===== */
+.mock-exam-section {
+  margin-top: 24px;
+  border-top: 2px solid var(--purple);
+  padding-top: 18px;
+}
+.mock-exam-section h4 {
+  margin: 0 0 12px;
+  color: var(--purple);
+  font-size: 16px;
+  font-weight: 700;
+}
+.mock-exam-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.mock-exam-card {
+  border: 2px solid var(--purple);
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--purple-soft);
+}
+.mock-exam-card .subj-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.mock-exam-card .exam-name {
+  font-weight: 700;
+  font-size: 14px;
+  margin: 6px 0 2px;
+}
+.mock-exam-card .exam-time {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.mock-exam-card .exam-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.mock-exam-card .exam-actions button {
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mock-exam-card .exam-actions .timer-display {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--purple);
+}
+@media (max-width: 600px) {
+  .mock-exam-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+  
+  
 </style>
 </head>
 <body>
@@ -1108,6 +1182,30 @@ function renderDayPanel(day){
 
  <div class="task-grid" id="taskGrid"></div>
 
+ // task-grid 아래에 모의고사 영역 추가 (mock: true인 경우에만)
+${d.mock ? `
+<div class="mock-exam-section">
+  <h4>📝 모의고사 (실제 시험 과목)</h4>
+  <div class="mock-exam-grid">
+    ${d.subjects.map((subj, idx) => {
+      const mockTimes = [30, 35, 40, 15];
+      const time = mockTimes[idx];
+      const color = SUBJECT_COLOR[idx];
+      return `<div class="mock-exam-card">
+        <span class="subj-tag" style="background:${color}">${SUBJECT_LABEL[idx]}</span>
+        <div class="exam-name">${subj.name}</div>
+        <div class="exam-time">⏱ 시험 시간: ${time}분</div>
+        <div class="exam-actions">
+          <button onclick="startMockTimer(${day},${idx})">타이머 시작</button>
+          <span class="timer-display" id="mock-elapsed-${idx}">00:00</span>
+          <button onclick="resetMockTimer(${idx})" style="background:var(--surface-soft); color:var(--ink); border:1px solid var(--line); padding:4px 10px; border-radius:20px; font-size:10px; cursor:pointer;">초기화</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+</div>
+` : ''}
+
  ${d.mock ? `
  <div class="mock-analysis">
  <h4>📝 모의고사 분석</h4>
@@ -1515,6 +1613,59 @@ function playBeepAlert(){
  osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + duration);
  }
  }catch(e){}
+}
+
+// ====== 모의고사 타이머 ======
+let mockTimerInterval = null;
+let mockRunning = false;
+let mockRemaining = [0, 0, 0, 0];
+let mockStartTimes = [0, 0, 0, 0];
+const MOCK_EXAM_TIMES = [30, 35, 40, 15];
+
+function startMockTimer(day, idx) {
+  if (mockRunning) return;
+  
+  const totalSec = MOCK_EXAM_TIMES[idx] * 60;
+  let remain = mockRemaining[idx] || totalSec;
+  if (remain <= 0) remain = totalSec;
+  
+  mockRunning = true;
+  const startTime = Date.now();
+  mockStartTimes[idx] = startTime;
+  
+  if (mockTimerInterval) clearInterval(mockTimerInterval);
+  
+  mockTimerInterval = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const left = Math.max(0, remain - elapsed);
+    const el = document.getElementById('mock-elapsed-'+idx);
+    if (el) {
+      const mins = Math.floor(left / 60);
+      const secs = Math.floor(left % 60);
+      el.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      if (left <= 0) {
+        clearInterval(mockTimerInterval);
+        mockRunning = false;
+        playBeepAlert();
+        el.textContent = '⏰ 시간 종료';
+        el.style.color = 'var(--coral)';
+      }
+    }
+  }, 200);
+}
+
+function resetMockTimer(idx) {
+  if (mockTimerInterval) {
+    clearInterval(mockTimerInterval);
+    mockTimerInterval = null;
+    mockRunning = false;
+  }
+  mockRemaining[idx] = 0;
+  const el = document.getElementById('mock-elapsed-'+idx);
+  if (el) {
+    el.textContent = '00:00';
+    el.style.color = 'var(--purple)';
+  }
 }
 
 function startTimer(day, idx){
