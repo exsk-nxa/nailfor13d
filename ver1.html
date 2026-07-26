@@ -1600,7 +1600,7 @@ function renderTaskGrid(day){
        <button class="secondary" onclick="stopwatchReset()">초기화</button>
      </div>
      <div class="lap-input-row">
-       <input type="text" id="lapLabelInput" placeholder="구간명 (예: 전처리, 1콧, 2콧, 탑)" onkeydown="if(event.key==='Enter'){stopwatchLap(); event.preventDefault();}">
+       <input type="text" id="lapLabelInput" placeholder="구간명 (예: 전처리, 1콧, 2콧, 탑)" onkeydown="if(event.key==='Enter' && !event.isComposing && event.keyCode!==229){stopwatchLap(); event.preventDefault();}">
        <button onclick="stopwatchLap()">구간 기록</button>
      </div>
      <div class="lap-list">
