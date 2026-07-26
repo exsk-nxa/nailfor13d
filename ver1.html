@@ -302,6 +302,7 @@
  .photo-card { flex: 0 0 140px; }
  .common-guide .photo-card { flex: 0 0 120px; }
  .photo-grid { gap: 12px; }
+}
 
 /* ===== 모의고사 전용 영역 ===== */
 .mock-exam-section {
@@ -374,6 +375,100 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+ /* ===== 개편: 날짜 드롭다운 ===== */
+ .day-select-wrap{display:flex; flex-direction:column; gap:4px;}
+ .day-select-label{font-size:11px; color:var(--ink-soft); font-weight:600; letter-spacing:.05em;}
+ .day-select{padding:10px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:700; color:var(--ink); cursor:pointer; box-shadow:var(--shadow); min-width:210px;}
+
+/* ===== 3분할 대시보드: 스톱워치 · 당일 과제 · 가이드&메모 ===== */
+.day-tools-row{display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; margin-bottom:30px; align-items:stretch;}
+@media (max-width:980px){
+ .day-tools-row{gap:12px;}
+ .tool-col{padding:16px 16px 14px;}
+ .tool-col-title{font-size:14px; margin-bottom:12px;}
+ .stopwatch-display{font-size:36px;}
+}
+@media (max-width:640px){
+ .day-tools-row{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; gap:12px; padding-bottom:6px; margin-bottom:24px;}
+ .day-tools-row .tool-col{flex:0 0 82%; scroll-snap-align:start;}
+}
+
+.tool-col{background:var(--surface); border-radius:22px; box-shadow:var(--shadow); padding:22px 22px 20px; display:flex; flex-direction:column; min-width:0;}
+.tool-col-title{font-size:15.5px; font-weight:800; color:var(--ink); margin:0 0 16px; display:flex; align-items:center; gap:7px;}
+
+/* --- 공용 서브 카드 --- */
+.tool-subcard{background:var(--surface-soft); border-radius:16px; padding:18px 18px 16px;}
+.tool-subcard + .tool-subcard{margin-top:14px;}
+.tool-subcard-label{font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px;}
+
+/* --- 스톱워치 --- */
+.stopwatch-display{font-size:46px; font-weight:800; text-align:center; color:var(--ink); font-variant-numeric:tabular-nums; letter-spacing:-1px; margin-bottom:14px; line-height:1;}
+.tool-btn-row{display:flex; gap:8px;}
+.tool-btn-row button{flex:1; border:none; border-radius:20px; padding:10px 0; font-weight:700; font-size:13px; cursor:pointer; transition:transform .15s ease, opacity .15s ease;}
+.tool-btn-row button:active{transform:scale(.97);}
+.tool-btn-row button.primary{background:var(--ink); color:#fff;}
+.tool-btn-row button.secondary{background:#fff; color:var(--ink); border:1px solid var(--line);}
+.tool-btn-row button.accent{background:var(--blue); color:#fff;}
+
+.lap-input-row{display:flex; gap:6px; margin-top:12px;}
+.lap-input-row input{flex:1; min-width:0; padding:8px 10px; border:1px solid var(--line); border-radius:10px; font-size:12px; font-family:'Noto Sans KR',sans-serif; background:#fff; color:var(--ink);}
+.lap-input-row button{flex-shrink:0; border:none; border-radius:10px; padding:0 14px; font-size:12px; font-weight:700; cursor:pointer; background:var(--blue); color:#fff;}
+.lap-list{max-height:168px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; margin-top:10px;}
+.lap-row{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 10px; font-size:12px;}
+.lap-row .lap-idx{font-weight:800; color:var(--blue); width:16px; flex-shrink:0; text-align:center;}
+.lap-row .lap-label{flex:1; min-width:0; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.lap-row .lap-time{font-weight:700; font-variant-numeric:tabular-nums; color:var(--ink); flex-shrink:0;}
+.lap-row .lap-del{flex-shrink:0; border:none; background:none; color:var(--ink-soft); font-size:13px; cursor:pointer; padding:0 2px; line-height:1;}
+.lap-row .lap-del:hover{color:var(--coral);}
+.lap-empty{font-size:11.5px; color:var(--ink-soft); text-align:center; padding:10px 0;}
+
+/* --- 알림 타이머 입력 --- */
+.alarm-inputs{display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px;}
+.alarm-inputs input{width:64px; padding:9px 4px; text-align:center; border:1px solid var(--line); border-radius:10px; font-size:15px; font-weight:700; color:var(--ink); background:#fff; font-family:'Noto Sans KR',sans-serif;}
+.alarm-inputs span{font-size:12px; color:var(--ink-soft); font-weight:600;}
+
+/* --- 과제 선택 탭 (segmented control) --- */
+.task-tabs-modern{display:flex; gap:6px; background:var(--surface-soft); padding:5px; border-radius:14px; margin-bottom:16px;}
+.task-tabs-modern button{flex:1; padding:9px 0; border:none; border-radius:10px; font-weight:700; font-size:12.5px; cursor:pointer; transition:all .18s ease; color:var(--ink-soft); background:transparent;}
+.task-tabs-modern button.active-tab{color:#fff; box-shadow:0 3px 8px -2px rgba(26,32,44,.25);}
+
+.task-card.day-task-card{border-top:4px solid var(--line); border-radius:16px; padding:18px 18px 16px; background:linear-gradient(180deg,#fff,#f9fafb); border-left:1px solid var(--line); border-right:1px solid var(--line); border-bottom:1px solid var(--line); flex:1; display:flex; flex-direction:column;}
+.day-task-card .content-name{font-size:16.5px; margin:0 0 4px;}
+.day-task-card .target-line{font-weight:600; color:var(--ink); margin-bottom:14px;}
+.day-task-card .field-label{font-size:11px; font-weight:700; color:var(--ink-soft); letter-spacing:.04em; margin-bottom:8px;}
+
+.per-timer-row{display:flex; align-items:center; justify-content:space-between; background:var(--surface-soft); border-radius:12px; padding:10px 12px; margin-top:auto; padding-top:14px;}
+.per-timer-row .t-target{font-size:11px; font-weight:700; color:var(--ink-soft);}
+.per-timer-row .t-elapsed{font-size:17px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums;}
+.per-timer-row .t-elapsed.over{color:var(--coral);}
+.per-timer-row .timer-btns button{border:none; background:var(--ink); color:#fff; font-size:11px; font-weight:700; border-radius:8px; padding:6px 10px; cursor:pointer; margin-left:5px;}
+.per-timer-row .timer-btns button.secondary{background:#fff; color:var(--ink); border:1px solid var(--line);}
+
+.tool-empty{background:var(--surface-soft); border-radius:14px; padding:28px 16px; text-align:center; color:var(--ink-soft); font-size:12.5px; font-weight:600; flex:1; display:flex; align-items:center; justify-content:center;}
+
+/* --- 가이드 & 메모 --- */
+.guide-card{border-radius:16px; padding:18px 18px 16px; flex:1; display:flex; flex-direction:column;}
+.guide-card .guide-title{font-size:13px; font-weight:800; margin-bottom:5px;}
+.guide-card .guide-formula{font-size:12.5px; font-weight:700; margin-bottom:12px;}
+.guide-card .guide-list{margin:0 0 16px; padding-left:18px; font-size:11.5px; color:var(--ink-soft); line-height:1.65;}
+.guide-card .guide-subhead{font-size:12px; font-weight:800; color:var(--ink); margin:0 0 8px; border-top:1px dashed var(--line); padding-top:14px;}
+
+.memo-block{flex:1; display:flex; flex-direction:column; margin-top:14px; border-top:1px dashed var(--line); padding-top:14px; min-height:140px;}
+.memo-block-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+.memo-block-head span{font-size:12px; font-weight:800; color:var(--ink);}
+.memo-block-head button{border:none; background:none; font-size:11px; font-weight:700; cursor:pointer; padding:2px 0; color:var(--ink);}
+.memo-block textarea{flex:1; width:100%; min-height:0; resize:none; border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-family:'Noto Sans KR',sans-serif; font-size:12.5px; line-height:1.6; box-sizing:border-box; background:#fff; color:var(--ink);}
+.memo-block textarea:focus{outline:none; border-color:var(--ink-soft);}
+.step-chips{display:flex; flex-wrap:wrap; align-items:center; gap:5px 3px; margin-bottom:6px;}
+.step-chips .chip{background:#fff; border:1px solid var(--line); border-radius:14px; padding:4px 10px; font-size:11px; font-weight:600; color:var(--ink); white-space:nowrap;}
+.step-chips .arrow{color:var(--ink-soft); font-size:10px;}
+.subtype-name{font-size:11.5px; font-weight:800; color:var(--purple); margin:10px 0 4px;}
+.subtype-name:first-child{margin-top:0;}
+
+.open-memo-btn{width:100%; padding:13px 0; font-size:13.5px; font-weight:700; color:#fff; border:none; border-radius:20px; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; box-shadow:0 6px 16px -6px rgba(26,32,44,.35); margin-top:16px;}
+.open-memo-btn:hover{transform:translateY(-2px);}
+.open-memo-btn:active{transform:translateY(0);}
 </style>
 </head>
 <body>
@@ -475,6 +570,7 @@ const PLAN = [
 const SUBJECT_LABEL = ['1과목','2과목','3과목','4과목'];
 const SUBJECT_COLOR = ['var(--blue)','var(--coral)','var(--purple)','var(--lime)'];
 const SUBJECT_COLOR_HEX = ['#4A6FA5','#E07A5F','#6B4C7A','#6A994E'];
+const SUBJECT_SOFT = ['var(--blue-soft)','var(--coral-soft)','var(--purple-soft)','var(--lime-soft)'];
 
 const GOAL_COUNTS = {
  '레드풀컬러': 85, '프렌치': 30, '딥프렌치': 28, '화이트그라데이션': 25,
@@ -613,6 +709,7 @@ function defaultDayState(dayIdx){
  return {
  reps: d.subjects.map(s => Array(s.count).fill(false)),
  timerRemaining: [null,null,null,null],
+ selectedTaskIdx: 0,
  feedback: '',
  subFeedback: ['','','',''],
  timeLogs: [null,null,null,null],
@@ -646,6 +743,7 @@ function ensureDay(day){
  if(!st.mockTimeLogs) st.mockTimeLogs = [null,null,null,null];
  if(!st.mockTaskPhotos) st.mockTaskPhotos = [['','',''],['','',''],['','',''],['','','']];
  if(!st.mockSubFeedback) st.mockSubFeedback = ['','','',''];
+ if(st.selectedTaskIdx===undefined || st.selectedTaskIdx===null) st.selectedTaskIdx = 0;
  return st;
 }
 
@@ -958,6 +1056,12 @@ function renderApp(){
  <h1>네일 실기 13일 완성 플래너 (종합본)</h1>
  <p>7/24(금) — 8/5(수) · 피드백, 모의고사 분석 및 종목별 점수 평가 포함</p>
  </div>
+ <div class="day-select-wrap">
+ <label class="day-select-label" for="daySelect">날짜 선택</label>
+ <select class="day-select" id="daySelect" onchange="selectDay(parseInt(this.value))">
+ ${PLAN.map(d=>`<option value="${d.day}" ${d.day===selectedDay?'selected':''}>Day ${d.day} · ${d.date}${d.mock?' 🚨모의':''}</option>`).join('')}
+ </select>
+ </div>
  <div class="overall-card">
  <div class="overall-ring">
  ${ringSVG(overall, 74, 'var(--blue)', 8)}
@@ -973,13 +1077,7 @@ function renderApp(){
 
  <div class="subject-row" id="subjectRow"></div>
 
- <section class="calendar">
- <div class="section-head">
- <h2>달력 · Day 1~13</h2>
- <span class="hint">칸을 누르면 아래에 그날의 대시보드가 열려요</span>
- </div>
- <div id="calWeeks"></div>
- </section>
+ <div class="day-tools-row" id="taskGrid"></div>
 
  <section class="day-panel" id="dayPanel"></section>
 
@@ -1138,8 +1236,6 @@ function renderDayPanel(day){
  </div>
  </div>
 
- <div class="task-grid" id="taskGrid"></div>
-
  ${d.mockSolo ? `
  <div class="mock-exam-section" style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed var(--purple);">
    <h4 style="margin: 0 0 16px; color: var(--purple); font-size: 18px; font-weight: 700; display:flex; align-items:center; gap:8px;">
@@ -1284,144 +1380,304 @@ function renderMockTaskGrid(day){
  }).join('');
 }
 
-function renderTaskGrid(day){
- const d = PLAN[day-1];
- const st = ensureDay(day);
- const grid = document.getElementById('taskGrid');
- if(!grid) return;
+/* ============ 실전 타이머 도구 + 과제별 가이드 & 메모 ============ */
+const TASK_TIME_GUIDE = [
+ { title:'합격 시간 공식 (1과목 · 매니큐어/패디큐어)',
+   formula:'베이스+컬러+탑코트 총 14분 ÷ 5손가락 ≈ 2.8분(2분 48초)/손가락',
+   breakdown:[
+     '손가락 1개당 베이스→컬러→탑코트를 2분 40초~3분 안에 마무리하는 페이스 유지',
+     '60분 중 15분은 소독·쉐입·큐티클 정리(2차 중간소독 포함), 나머지 시간에 컬러링'
+   ]},
+ { title:'합격 시간 공식 (2과목 · 젤 마블)',
+   formula:'마블 작업 한 손톱당 4분 × 5손가락 = 20분 (총 35분 중)',
+   breakdown:[
+     '전처리 5분 · 베이스/원콧 5분 · 마블 20분(손가락당 4분) · 탑 마무리 5분',
+     '손가락 1개를 처음부터 끝까지 완성하는 데 약 7분(전처리1+베이스1+마블4+탑1) 소요'
+   ]},
+ { title:'합격 시간 공식 (3과목 · 인조네일, 2손가락 기준)',
+   formula:'40분 ÷ 2손가락 = 손가락 1개 완성에 약 20분',
+   breakdown:[
+     '전처리 손가락당 약 1분 30초 · 연장 본작업 손가락당 약 10분',
+     '파일링 손가락당 약 7~7분 30초 · 마무리 손가락당 약 2~3분'
+   ]},
+ { title:'합격 시간 공식 (4과목 · 인조네일 제거)',
+   formula:'총 제한시간 15분 내 제거 완료',
+   breakdown:[
+     '연장 길이 제거 및 표면 파일링 약 3분',
+     '쏙오프 약 7~8분 · 마무리 정리 약 3~4분'
+   ]}
+];
 
- grid.innerHTML = d.subjects.map((subj, idx)=>{
- const reps = st.reps[idx];
- const donePct = reps.length? Math.round(reps.filter(Boolean).length/reps.length*100):0;
- const perRepMin = perRepMinutes(day, idx);
- const isRunning = runningTimer && runningTimer.day===day && runningTimer.idx===idx && !runningTimer.isMock && runningTimer.status === 'running';
- const isFinished = runningTimer && runningTimer.day===day && runningTimer.idx===idx && !runningTimer.isMock && runningTimer.status === 'finished';
- let displayText = '', isOver = false, overSec = 0;
+/* 과제별 핵심 팁 + 간략 순서 자동 출력용 데이터 (기존 노하우 문서 기반) */
+const TASK_TIPS = [
+ { // 1과목
+   steps: ['소독','풀콧 제거','쉐입','핑거볼/리무버','푸셔 큐티클정리','중간소독','베이스','컬러','탑코트'],
+   tips: [
+     '중간 소독은 소독액을 거즈에 뿌려 닦거나, 모델 손을 살짝 비켜 옆에서 뿌리기',
+     '프리엣지(손톱 끝)까지 꼼꼼히 발랐는지 확인 — 감독관이 유심히 보는 포인트',
+     '그라데이션은 시간 부족 시 2콧, 여유 있으면 3콧까지',
+     '네일월에 묻은 폴리시는 오렌지우드스틱보다 거즈로 닦는 것이 편함',
+     '마무리 오일은 흡수 빠른 제품, 탑코트는 빨리 마르는 제품 사용(단 사전 준비 시엔 비추천)'
+   ]
+ },
+ { // 2과목
+   steps: ['전처리','베이스/원콧(부채꼴 시)','마블 작업(손톱당 4분)','탑 마무리'],
+   tips: [
+     '레드·화이트 전용 붓을 분리해서 사용 (하나로 닦아가며 쓸 시간 없음)',
+     '같은 브랜드 젤로 점도를 맞춰야 색이 섞이거나 마블이 흐트러지지 않음',
+     '흰색-빨간색 선의 두께를 일정하게, 5손가락 모두 비슷한 모양 유지 + 프리엣지 바르기 필수',
+     '연습 시 스트리퍼/필오프베이스 사용 가능 — 단, 실제 시험에서는 절대 사용 금지'
+   ]
+ },
+ { // 3과목 - 세부 종목별로 나눔
+   subtypes: [
+     { name:'내추럴 팁 위드 랩', keywords:['팁위드랩','팁'],
+       steps:['소독/모양 만들기','팁 부착·턱 제거','글루+필러파우더','실크 재단·부착','파일링·마무리'],
+       tips:['기포 생기지 않게 팁 부착, 턱 파일링 시 자연손톱 손상 극도로 주의','모델 손톱 사이즈 미리 암기는 OK, 미리 빼놓는 것은 부정행위']},
+     { name:'아크릴 프렌치 스컬프처', keywords:['아크릴'],
+       steps:['폼지 끼우기','아크릴 볼(화이트 프렌치+투명 바디)','C커브 핀칭','폼지 제거','파일링'],
+       tips:['날씨·붓터치에 따라 굳는 속도가 달라지므로 시험장 환경 미리 파악','핀칭 타이밍을 놓치면 옆선이 퍼져 수습 불가 — 타이밍이 점수와 직결']},
+     { name:'젤 원톤 스컬프처', keywords:['젤'],
+       steps:['폼지 끼우기','베이스젤+큐어링','클리어젤 하이포인트+큐어링','폼지 제거·파일링','탑젤'],
+       tips:['젤은 아크릴보다 잘 갈리므로 힘 조절 주의(모양 과하게 깎지 않기)','스트레스 포인트에 젤을 도톰히 올려야 폼지 제거 후 패임 방지']},
+     { name:'네일랩 익스텐션(실크)', keywords:['실크'],
+       steps:['실크 재단·부착','글루+필러파우더 반복','파일링','분진 정리·광택'],
+       tips:['실크는 결이 틀어지지 않게 부착, 먼지·분진 유입 시 투명도 저하','깨짐 반복 시 글루 브랜드 교체 또는 필러파우더 양 조절']}
+   ]
+ },
+ { // 4과목
+   steps: ['연장 길이 제거·표면 파일링','쏙오프','마무리(자연네일 파일링)'],
+   tips: [
+     '클리퍼로 연장된 프리엣지를 먼저 안전하게 잘라내기',
+     '파일링 시 자연 손톱·주변 피부에 상처 내지 않도록 주의',
+     '아세톤+호일 감싸기 전 피부 보호용 큐티클 오일 도포',
+     '제한 시간 15분 내 완료 목표'
+   ]
+ }
+];
 
- if(isRunning){
- const left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000);
- displayText = fmtTime(left);
- } else if(isFinished){
- const elapsed = (Date.now() - runningTimer.finishedAt) / 1000;
- overSec = elapsed; displayText = fmtOverTime(elapsed); isOver = true;
+/* --- 스톱워치 (구간기록 포함) --- */
+let stopwatch = { running:false, startedAt:0, elapsedBefore:0, laps:[] };
+let stopwatchInterval = null;
+
+function getStopwatchElapsedMs(){
+ return stopwatch.running ? stopwatch.elapsedBefore + (Date.now()-stopwatch.startedAt) : stopwatch.elapsedBefore;
+}
+function fmtStopwatch(ms){
+ const totalSec = Math.floor(ms/1000);
+ const mm = String(Math.floor(totalSec/60)).padStart(2,'0');
+ const ss = String(totalSec%60).padStart(2,'0');
+ const cs = String(Math.floor((ms%1000)/10)).padStart(2,'0');
+ return `${mm}:${ss}.${cs}`;
+}
+function updateStopwatchDisplay(){
+ const el = document.getElementById('stopwatchDisplay');
+ if(el) el.textContent = fmtStopwatch(getStopwatchElapsedMs());
+}
+function stopwatchToggle(){
+ if(stopwatch.running){
+   stopwatch.elapsedBefore += Date.now()-stopwatch.startedAt;
+   stopwatch.running = false;
+   clearInterval(stopwatchInterval);
  } else {
- const remainStored = getRemaining(day, idx, false);
- displayText = remainStored <= 0 ? '시간 종료' : fmtTime(remainStored);
+   stopwatch.startedAt = Date.now();
+   stopwatch.running = true;
+   stopwatchInterval = setInterval(updateStopwatchDisplay, 50);
  }
+ renderTaskGrid(selectedDay);
+}
+function stopwatchReset(){
+ stopwatch.running = false;
+ clearInterval(stopwatchInterval);
+ stopwatch.elapsedBefore = 0;
+ stopwatch.laps = [];
+ renderTaskGrid(selectedDay);
+}
+function stopwatchLap(){
+ const input = document.getElementById('lapLabelInput');
+ const label = (input && input.value.trim()) || `구간 ${stopwatch.laps.length+1}`;
+ stopwatch.laps.push({ label, time:getStopwatchElapsedMs() });
+ renderTaskGrid(selectedDay);
+}
+function stopwatchDeleteLap(idx){
+ stopwatch.laps.splice(idx, 1);
+ renderTaskGrid(selectedDay);
+}
 
- const timeLog = st.timeLogs[idx] || '';
+/* --- 간단 알림 타이머 (입력창+버튼만, 시각적 애니메이션 없음) --- */
+let alarmState = { running:false };
+let alarmTimeout = null;
+
+function alarmStart(){
+ const min = parseInt(document.getElementById('alarmMin').value) || 0;
+ const sec = parseInt(document.getElementById('alarmSec').value) || 0;
+ const totalSec = min*60 + sec;
+ if(totalSec <= 0){ alert('알림 시간을 입력해주세요.'); return; }
+ clearTimeout(alarmTimeout);
+ alarmState.running = true;
+ alarmTimeout = setTimeout(alarmFire, totalSec*1000);
+ renderTaskGrid(selectedDay);
+}
+function alarmStop(){
+ clearTimeout(alarmTimeout);
+ alarmState.running = false;
+ renderTaskGrid(selectedDay);
+}
+function alarmFire(){
+ alarmState.running = false;
+ try{
+   const utter = new SpeechSynthesisUtterance('설정하신 시간이 종료되었습니다');
+   utter.lang = 'ko-KR';
+   speechSynthesis.speak(utter);
+ }catch(e){}
+ alert('⏰ 알림: 설정하신 시간이 종료되었습니다.');
+ renderTaskGrid(selectedDay);
+}
+
+// 탭 클릭 시 과목 변경하는 함수
+function selectTaskSubject(day, idx){ 
+  const st = ensureDay(day); 
+  st.selectedTaskIdx = idx; 
+  saveState(); 
+  renderTaskGrid(day); 
+}
+
+function renderTaskGrid(day){
+ const d = PLAN[day-1]; const st = ensureDay(day); const grid = document.getElementById('taskGrid'); if(!grid) return;
+
+ // 현재 선택된 탭 번호 (기본 0 = 1과목)
+ const activeIdx = st.selectedTaskIdx || 0;
+ const subj = d.subjects[activeIdx];
+ const reps = st.reps[activeIdx] || [];
+ const donePct = reps.length ? Math.round(reps.filter(Boolean).length/reps.length*100) : 0;
+ const perRepMin = perRepMinutes(day, activeIdx);
+ const timeLog = st.timeLogs[activeIdx] || '';
+ const color = SUBJECT_COLOR[activeIdx];
+ const soft = SUBJECT_SOFT[activeIdx];
+
+ const isRunning = runningTimer && runningTimer.day===day && runningTimer.idx===activeIdx && !runningTimer.isMock && runningTimer.status === 'running';
+ const isFinished = runningTimer && runningTimer.day===day && runningTimer.idx===activeIdx && !runningTimer.isMock && runningTimer.status === 'finished';
+ let displayText = '', isOver = false;
+ if(isRunning){ const left = Math.max(0, runningTimer.duration - (Date.now()-runningTimer.startedAt)/1000); displayText = fmtTime(left); }
+ else if(isFinished){ const elapsed = (Date.now() - runningTimer.finishedAt) / 1000; displayText = fmtOverTime(elapsed); isOver = true; }
+ else { const remainStored = getRemaining(day, activeIdx, false); displayText = remainStored <= 0 ? '시간 종료' : fmtTime(remainStored); }
+
  let compareText = '', compareClass = '';
- if(timeLog !== '' && timeLog !== null) {
- const actual = parseFloat(timeLog);
- if(!isNaN(actual)) {
- const diff = actual - perRepMin;
- if(diff > 0) { compareText = `+${diff.toFixed(1)}분 초과`; compareClass = 'bad'; }
- else if(diff < 0) { compareText = `${diff.toFixed(1)}분 단축`; compareClass = 'good'; }
- else { compareText = '정확히 일치'; compareClass = 'good'; }
- }
- }
+ if(timeLog !== '' && timeLog !== null){ const actual = parseFloat(timeLog); if(!isNaN(actual)){ const diff = actual - perRepMin; if(diff > 0){ compareText = `+${diff.toFixed(1)}분 초과`; compareClass = 'bad'; } else if(diff < 0){ compareText = `${diff.toFixed(1)}분 단축`; compareClass = 'good'; } else { compareText = '정확히 일치'; compareClass = 'good'; } } }
 
- const taskPhotos = st.taskPhotos || [['','',''],['','',''],['','',''],['','','']];
- let photoArr = taskPhotos[idx];
- if(!Array.isArray(photoArr)) photoArr = [photoArr || '', '', ''];
- const previewUrl0 = getDriveImageUrl(photoArr[0]);
- const previewUrl1 = getDriveImageUrl(photoArr[1]);
- const previewUrl2 = getDriveImageUrl(photoArr[2]);
+ // 과제 가이드 텍스트 불러오기 (에러 방지 처리)
+ let guide = { title:'기본 가이드', formula:'시간 배분에 유의하세요', breakdown:[] };
+ let tipData = { steps:[], tips:[] };
+ if(TASK_TIME_GUIDE && TASK_TIME_GUIDE[activeIdx]) guide = TASK_TIME_GUIDE[activeIdx];
+ if(TASK_TIPS && TASK_TIPS[activeIdx]) tipData = TASK_TIPS[activeIdx];
 
- return `<div class="task-card">
- <span class="subj-tag" style="background:${SUBJECT_COLOR[idx]}">${SUBJECT_LABEL[idx]}</span>
- <p class="content-name">${subj.name}</p>
- ${(() => {
- const dayTotal = calculateDayTotal(d);
- const subjectTime = dayTotal.details[idx] ? dayTotal.details[idx].time : 0;
- if (subjectTime <= 0) return '';
-
- if (d.mock) {
-   return `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간 (실제 시험 시간)</div>
-           <div style="font-size:11px; color:var(--purple); margin-bottom:4px;">📌 실제 시험 과목</div>`;
+ const chipRow = steps => `<div class="step-chips">${steps.map(s=>`<span class="chip">${s}</span>`).join('<span class="arrow">→</span>')}</div>`;
+ let guideHtml = '';
+ if(tipData.subtypes){
+   const matched = tipData.subtypes.filter(s => s.keywords && s.keywords.some(k => subj.name.includes(k)));
+   const toShow = matched.length ? matched : tipData.subtypes;
+   guideHtml = toShow.map(s => `<div class="subtype-name">${s.name}</div>${chipRow(s.steps)}`).join('');
+ } else if(tipData.steps && tipData.steps.length){
+   guideHtml = chipRow(tipData.steps);
  }
 
- let typeTag = '';
- let descText = '';
- const name = subj.name;
+ const timerBtns = isRunning
+   ? `<button onclick="openVisualTimer(${day},${activeIdx},false)" style="background:${color};">확대</button><button class="secondary" onclick="pauseTimer(${day},${activeIdx},false)">정지</button>`
+   : isFinished
+   ? `<button onclick="openVisualTimer(${day},${activeIdx},false)" style="background:${color};">확대</button><button class="secondary" onclick="startTimer(${day},${activeIdx},false)">다시</button>`
+   : `<button onclick="openVisualTimer(${day},${activeIdx},false)" style="background:${color};">확대</button><button class="secondary" onclick="startTimer(${day},${activeIdx},false)">${displayText === '시간 종료' ? '다시' : '시작'}</button>`;
 
- if (idx === 0) {
-   if (name.includes('풀')) {
-     typeTag = '풀세트';
-     descText = '케어 + 컬러링 2세트 (베이스·컬러·탑)';
-   } else if (name.includes('축소') || name.includes('단일')) {
-     typeTag = '하프세트';
-     descText = '축소 버전 또는 단일 컬러링';
-   }
- } else if (idx === 1) {
-   if (name.includes('합본')) {
-     typeTag = '합본 (Full)';
-     descText = '선마블링 + 부채꼴마블링 동시 시술';
-   } else if (name.includes('단일')) {
-     typeTag = '단일 (Half)';
-     descText = '선마블링 또는 부채꼴마블링 중 하나';
-   }
- } else if (idx === 2) {
-   if (name !== '연장 없음') {
-     typeTag = '연장';
-     descText = '아크릴/실크/젤/팁위드랩 중 1회';
-   }
- } else if (idx === 3) {
-   if (name !== '제거 없음') {
-     typeTag = '제거';
-     descText = '인조네일 제거 1회';
-   }
- }
-
- return `<div class="est-time" style="font-size:12px; color:var(--blue); font-weight:600; margin-bottom:2px;">⏱ 예상 소요: ${subjectTime.toFixed(2)}시간${typeTag ? ` (${typeTag})` : ''}</div>
-         ${descText ? `<div style="font-size:11px; color:var(--ink-soft); margin-bottom:4px;">✔ ${descText}</div>` : ''}`;
-})()}
-
- <div class="target-line">목표 ${subj.count}회 · 회당 목표 ${perRepMin}분</div>
- <div class="reps">
- ${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${SUBJECT_COLOR[idx]};`:''}" onclick="toggleRep(${day},${idx},${ri},false)">${done? '✓' : ri+1}</button>`).join('')}
- </div>
- <div class="task-mini-track"><div class="task-mini-fill" style="width:${donePct}%; background:${SUBJECT_COLOR[idx]}"></div></div>
- <div class="time-log-row">
- <label>실제 소요(분):</label>
- <input type="number" min="0" step="0.5" value="${timeLog}" placeholder="분" onchange="updateTimeLog(${day},${idx},this.value,false)">
- ${compareText ? `<span class="compare ${compareClass}">${compareText}</span>` : ''}
- </div>
- <div class="timer-row">
- <div><div class="t-target">회당 ${perRepMin}분 타이머</div><div class="t-elapsed ${isOver?'over':''}" id="elapsed-${idx}">${displayText}</div></div>
- <div class="timer-btns">
- ${isRunning ? `<button onclick="openVisualTimer(${day},${idx},false)">타이머 열기</button><button onclick="pauseTimer(${day},${idx},false)">일시정지</button>` : isFinished ? `<button onclick="openVisualTimer(${day},${idx},false)">타이머 열기</button><button onclick="startTimer(${day},${idx},false)">다시 시작</button>` : `<button onclick="openVisualTimer(${day},${idx},false)">타이머 열기</button><button onclick="startTimer(${day},${idx},false)">${displayText === '시간 종료' ? '다시 시작':'시작'}</button>`}
- <button class="secondary" onclick="resetTimer(${day},${idx},false)">초기화</button>
- </div>
+ // 3분할 레이아웃 그리기
+ grid.innerHTML = `
+ <!-- 1열: 스톱워치 & 타이머 -->
+ <div class="tool-col">
+   <div class="tool-col-title">⏱ 스톱워치 &amp; 타이머</div>
+   <div class="tool-subcard">
+     <div class="tool-subcard-label">실전 스톱워치</div>
+     <div class="stopwatch-display" id="stopwatchDisplay">${fmtStopwatch(getStopwatchElapsedMs())}</div>
+     <div class="tool-btn-row">
+       <button class="primary" onclick="stopwatchToggle()">${stopwatch.running ? '일시정지' : '시작'}</button>
+       <button class="secondary" onclick="stopwatchReset()">초기화</button>
+     </div>
+     <div class="lap-input-row">
+       <input type="text" id="lapLabelInput" placeholder="구간명 (예: 전처리, 1콧, 2콧, 탑)" onkeydown="if(event.key==='Enter'){stopwatchLap(); event.preventDefault();}">
+       <button onclick="stopwatchLap()">구간 기록</button>
+     </div>
+     <div class="lap-list">
+       ${stopwatch.laps.length ? stopwatch.laps.map((l,i)=>`<div class="lap-row"><span class="lap-idx">${i+1}</span><span class="lap-label">${escapeHtml(l.label)}</span><span class="lap-time">${fmtStopwatch(l.time)}</span><button class="lap-del" onclick="stopwatchDeleteLap(${i})" title="삭제">✕</button></div>`).join('') : `<div class="lap-empty">기록된 구간이 없습니다</div>`}
+     </div>
+   </div>
+   <div class="tool-subcard">
+     <div class="tool-subcard-label">간단 알림 타이머</div>
+     <div class="alarm-inputs">
+       <input type="number" id="alarmMin" min="0" placeholder="0"><span>분</span>
+       <input type="number" id="alarmSec" min="0" max="59" placeholder="0"><span>초</span>
+     </div>
+     <div class="tool-btn-row">
+       <button class="accent" onclick="alarmStart()">알림 시작</button>
+       <button class="secondary" onclick="alarmStop()">정지</button>
+     </div>
+   </div>
  </div>
 
- <div class="task-photo" style="margin-top:8px; margin-bottom:12px; background:#fff; padding:10px 12px; border-radius:10px; border:1px solid var(--line);">
- <label style="font-size:11px; font-weight:700; color:var(--ink); display:block; margin-bottom:6px;">📸 작품 사진 (정면 / 측면 / 45도)</label>
- <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
- <div>
- <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="정면 링크" value="${escapeHtml(photoArr[0])}" onchange="updateTaskPhoto(${day},${idx},0,this.value,false)">
- ${previewUrl0 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl0}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">정면</div>`}
- </div>
- <div>
- <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="측면 링크" value="${escapeHtml(photoArr[1])}" onchange="updateTaskPhoto(${day},${idx},1,this.value,false)">
- ${previewUrl1 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl1}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">측면</div>`}
- </div>
- <div>
- <input type="text" style="width:100%; font-size:10.5px; padding:5px 6px; border:1px solid var(--line); border-radius:6px; box-sizing:border-box; margin-bottom:4px;" placeholder="45도 링크" value="${escapeHtml(photoArr[2])}" onchange="updateTaskPhoto(${day},${idx},2,this.value,false)">
- ${previewUrl2 ? `<div style="height:70px; border-radius:6px; overflow:hidden; border:1px solid var(--line); position:relative; background:#f9fafb;"><iframe src="${previewUrl2}" style="width:100%; height:100%; border:none; position:absolute; top:0; left:0;"></iframe></div>` : `<div style="height:70px; border-radius:6px; border:1px dashed var(--line); background:#f9fafb; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink-soft);">45도</div>`}
- </div>
- </div>
+ <!-- 2열: 당일 과제 선택 탭 -->
+ <div class="tool-col">
+   <div class="tool-col-title">📋 당일 과제</div>
+   <div class="task-tabs-modern">
+     ${SUBJECT_LABEL.map((label, i) => `<button class="${i===activeIdx?'active-tab':''}" style="${i===activeIdx?`background:${SUBJECT_COLOR[i]};`:''}" onclick="selectTaskSubject(${day},${i})">${label}</button>`).join('')}
+   </div>
+
+   ${subj.count > 0 ? `
+   <div class="task-card day-task-card" style="border-top-color:${color};">
+     <p class="content-name">${subj.name}</p>
+     <div class="target-line">목표 ${subj.count}회 · 회당 ${perRepMin}분</div>
+
+     <div class="field-label">진행률 체크</div>
+     <div class="reps">${reps.map((done,ri)=>`<button class="rep-btn ${done?'done':''}" style="${done?`background:${color};`:''}" onclick="toggleRep(${day},${activeIdx},${ri},false)">${done? '✓' : ri+1}</button>`).join('')}</div>
+     <div class="task-mini-track"><div class="task-mini-fill" style="width:${donePct}%; background:${color};"></div></div>
+
+     <div class="time-log-row" style="margin-top:14px;">
+       <label>실제 소요(분):</label>
+       <input type="number" min="0" step="0.5" value="${timeLog}" placeholder="0" onchange="updateTimeLog(${day},${activeIdx},this.value,false)">
+       ${compareText ? `<span class="compare ${compareClass}">${compareText}</span>` : ''}
+     </div>
+
+     <div class="per-timer-row">
+       <div>
+         <div class="t-target">회당 타이머</div>
+         <div class="t-elapsed ${isOver?'over':''}" id="elapsed-${activeIdx}">${displayText}</div>
+       </div>
+       <div class="timer-btns">
+         ${timerBtns}
+         <button class="secondary" onclick="resetTimer(${day},${activeIdx},false)">초기화</button>
+       </div>
+     </div>
+   </div>
+   ` : `<div class="tool-empty">오늘 이 과목은 연습 일정이 없습니다.</div>`}
  </div>
 
- <div class="subfeedback">
- <label style="display:flex; justify-content:space-between; align-items:center;">
- <span>이 과제 메모</span>
- <button type="button" onclick="openMemoModal(${day},${idx},false)" style="border:none; background:none; color:var(--blue); font-size:11px; font-weight:700; cursor:pointer; padding:0;">🔍 크게 보기</button>
- </label>
- <textarea id="subfb-${day}-${idx}" placeholder="종목별 피드백..." oninput="updateSubFeedback(${day},${idx}, this.value, false)">${escapeHtml(st.subFeedback[idx]||'')}</textarea>
- </div>
+ <!-- 3열: 가이드 및 메모장 열기 -->
+ <div class="tool-col">
+   <div class="tool-col-title">📝 가이드 &amp; 메모</div>
+   ${subj.count > 0 ? `
+   <div class="guide-card" style="background:${soft};">
+     <div class="guide-title" style="color:${color};">${guide.title}</div>
+     <div class="guide-formula" style="color:var(--ink);">${guide.formula}</div>
+     <ul class="guide-list">
+       ${guide.breakdown.map(b=>`<li>${b}</li>`).join('')}
+     </ul>
+     ${guideHtml ? `<div class="guide-subhead">💡 핵심 단계 확인</div>${guideHtml}` : ''}
+
+     <div class="memo-block">
+       <div class="memo-block-head">
+         <span>📝 이 과제 메모</span>
+         <button type="button" onclick="openMemoModal(${day},${activeIdx},false)" style="color:${color};">🔍 크게 보기</button>
+       </div>
+       <textarea id="subfb-${day}-${activeIdx}" placeholder="종목별 피드백을 적어보세요..." oninput="updateSubFeedback(${day},${activeIdx}, this.value, false)">${escapeHtml(st.subFeedback[activeIdx]||'')}</textarea>
+     </div>
+   </div>
+   ` : `<div class="tool-empty">일정이 없어 메모가 비활성화되었습니다.</div>`}
  </div>`;
- }).join('');
 }
 
 /* ============ 9. 차트 렌더링 ============ */
