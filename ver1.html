@@ -2090,10 +2090,12 @@ function openVisualTimer(day, idx, isMock = false){
     
     const stepsEl = document.getElementById('vStepsText');
     if(stepsEl){ 
-        const memoKey = getTimerMemoKey(runningTimer.name);
-        stepsEl.value = loadStepNotes(memoKey, runningTimer.name); 
-        stepsEl.oninput = ()=> saveStepNotes(memoKey, stepsEl.value); 
+        const st = ensureDay(runningTimer.day);
+        const curVal = runningTimer.isMock ? (st.mockSubFeedback[runningTimer.idx]||'') : (st.subFeedback[runningTimer.idx]||'');
+        stepsEl.value = curVal;
+        stepsEl.oninput = ()=> updateSubFeedback(runningTimer.day, runningTimer.idx, stepsEl.value, runningTimer.isMock);
     }
+    vtContext = { day: runningTimer.day, idx: runningTimer.idx, isMock: runningTimer.isMock };
     updateVisualTimerUI(left, overSec); return;
   }
 
@@ -2121,10 +2123,12 @@ function openVisualTimer(day, idx, isMock = false){
   
   const stepsEl = document.getElementById('vStepsText');
   if(stepsEl){ 
-      const memoKey = getTimerMemoKey(name);
-      stepsEl.value = loadStepNotes(memoKey, name); 
-      stepsEl.oninput = ()=> saveStepNotes(memoKey, stepsEl.value); 
+      const st = ensureDay(day);
+      const curVal = isMock ? (st.mockSubFeedback[idx]||'') : (st.subFeedback[idx]||'');
+      stepsEl.value = curVal;
+      stepsEl.oninput = ()=> updateSubFeedback(day, idx, stepsEl.value, isMock);
   }
+  vtContext = { day, idx, isMock };
 }
 
 function updateVisualTimerUI(left, overSec){
@@ -2139,7 +2143,7 @@ function updateVisualTimerUI(left, overSec){
  face.style.background = `conic-gradient(var(--coral) 0% 100%, #e2e8f0 100% 100%)`;
  }
 }
-function closeVisualTimer(){ document.getElementById('visualTimerRoot').innerHTML = ''; }
+function closeVisualTimer(){ document.getElementById('visualTimerRoot').innerHTML = ''; vtContext = null; }
 
 /* ============ 11. 기타 인터렉션 ============ */
 function toggleRep(day, idx, repIdx, isMock = false){
@@ -2149,11 +2153,25 @@ function toggleRep(day, idx, repIdx, isMock = false){
  saveState(); updateAllUI();
 }
 
+let vtContext = null; // {day, idx, isMock} of the currently-open visual timer modal, for memo sync
+
 function updateSubFeedback(day, idx, val, isMock = false){ 
  const st = ensureDay(day);
  if (isMock) st.mockSubFeedback[idx] = val;
  else st.subFeedback[idx] = val;
  saveState(); 
+ syncSubFeedbackUI(day, idx, isMock, val);
+}
+
+function syncSubFeedbackUI(day, idx, isMock, val){
+ const inlineId = (isMock ? 'mock-subfb-' : 'subfb-') + day + '-' + idx;
+ const inlineEl = document.getElementById(inlineId);
+ if(inlineEl && document.activeElement !== inlineEl) inlineEl.value = val;
+
+ const stepsEl = document.getElementById('vStepsText');
+ if(stepsEl && vtContext && vtContext.day===day && vtContext.idx===idx && vtContext.isMock===isMock && document.activeElement !== stepsEl){
+   stepsEl.value = val;
+ }
 }
 
 function updateTimeLog(day, idx, val, isMock = false){ 
